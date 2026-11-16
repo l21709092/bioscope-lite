@@ -1,51 +1,102 @@
 
 import {
+  Search,
   Compass,
   Dna,
   Microscope,
   Brain,
-  Clock3
+  Leaf,
+  HeartPulse,
+  History,
+  Bookmark,
+  Atom
 } from "lucide-react";
 
-export default function Sidebar() {
+const categories = [
+  { id: "Molecular Biology", icon: Dna },
+  { id: "Cell Biology", icon: Microscope },
+  { id: "Neuroscience", icon: Brain },
+  { id: "Botany", icon: Leaf },
+  { id: "Human Physiology", icon: HeartPulse }
+];
+
+export default function Sidebar({
+  activeSection,
+  onSelectSection,
+  searchQuery,
+  setSearchQuery
+}) {
   return (
     <aside className="sidebar">
+
+      <div className="sidebar-brand">
+        <Atom size={21} />
+        <span>EXPLORE</span>
+      </div>
+
+      <div className="sidebar-search">
+        <Search size={17} />
+
+        <input
+          type="text"
+          placeholder="Search biology..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+        />
+      </div>
+
       <p className="sidebar-heading">WORKSPACE</p>
 
-      <button className="nav-item active">
+      <button
+        className={`nav-item ${activeSection === "Explore" ? "active" : ""}`}
+        onClick={() => onSelectSection("Explore")}
+      >
         <Compass size={18} />
         Explore
       </button>
 
-      <p className="sidebar-heading">BIOLOGY LIBRARY</p>
+      <p className="sidebar-heading">BIOLOGY STREAMS</p>
 
-      <button className="nav-item">
-        <Dna size={18} />
-        Molecular Biology
+      {categories.map((category) => {
+        const Icon = category.icon;
+
+        return (
+          <button
+            key={category.id}
+            className={`nav-item ${
+              activeSection === category.id ? "active" : ""
+            }`}
+            onClick={() => onSelectSection(category.id)}
+          >
+            <Icon size={18} />
+            {category.id}
+          </button>
+        );
+      })}
+
+      <p className="sidebar-heading">YOUR LIBRARY</p>
+
+      <button
+        className={`nav-item ${activeSection === "History" ? "active" : ""}`}
+        onClick={() => onSelectSection("History")}
+      >
+        <History size={18} />
+        Recently explored
       </button>
 
-      <button className="nav-item">
-        <Microscope size={18} />
-        Cell Biology
-      </button>
-
-      <button className="nav-item">
-        <Brain size={18} />
-        Neuroscience
-      </button>
-
-      <p className="sidebar-heading">YOUR WORK</p>
-
-      <button className="nav-item">
-        <Clock3 size={18} />
-        Recent Scenes
+      <button
+        className={`nav-item ${activeSection === "Bookmarks" ? "active" : ""}`}
+        onClick={() => onSelectSection("Bookmarks")}
+      >
+        <Bookmark size={18} />
+        Bookmarks
       </button>
 
       <div className="sidebar-footer">
         <span className="status-dot" />
-        BioScope Engine Ready
+        BioScope Engine
       </div>
+
     </aside>
   );
 }
-

@@ -505,3 +505,111 @@ button {
     min-height: 360px;
   }
 }
+
+/* BIOSCOPE LAB NAVIGATION REDESIGN */
+
+.sidebar {
+  width: 250px;
+  min-width: 250px;
+  padding: 24px 14px;
+  background: #0a1220;
+  border-right: 1px solid #1c2940;
+}
+
+.sidebar-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 5px 10px 22px;
+  color: #5eead4;
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 700;
+  font-size: 12px;
+  letter-spacing: 2px;
+}
+
+.sidebar-search {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 11px;
+  margin-bottom: 25px;
+  background: #111d2e;
+  border: 1px solid #26354d;
+  border-radius: 9px;
+  color: #64748b;
+}
+
+.sidebar-search input {
+  width: 100%;
+  min-width: 0;
+  background: transparent;
+  color: #e2e8f0;
+  border: none;
+  outline: none;
+  font-size: 12px;
+}
+
+.sidebar-search input::placeholder {
+  color: #64748b;
+}
+
+.sidebar-heading {
+  color: #64748b;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 1.6px;
+  margin: 25px 10px 11px;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 11px 12px;
+  margin: 3px 0;
+  color: #94a3b8;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  text-align: left;
+  font-size: 12px;
+  transition: 160ms ease;
+}
+
+.nav-item:hover {
+  background: #142536;
+  color: #dbeafe;
+}
+
+.nav-item.active {
+  background: #14323a;
+  border-color: #23505a;
+  color: #5eead4;
+}
+
+.sidebar-footer {
+  font-size: 10px;
+  color: #64748b;
+}
+
+/* RESPONSIVE SIDEBAR */
+
+@media (max-width: 650px) {
+  .sidebar {
+    width: 100%;
+    min-width: 0;
+    padding: 12px;
+  }
+
+  .sidebar-brand,
+  .sidebar-heading,
+  .sidebar-footer {
+    display: none;
+  }
+
+  .sidebar-search {
+    margin-bottom: 8px;
+  }
+}
