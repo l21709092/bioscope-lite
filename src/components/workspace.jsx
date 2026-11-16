@@ -1,33 +1,32 @@
 
 import { useState } from "react";
-import PromptBar from "./PromptBar";
-import Viewer from "./Viewer";
-import Inspector from "./Inspector";
+import PromptBar from "./promptbar";
+import Viewer from "./viewer";
+import Inspector from "./inspector";
 
 export default function Workspace() {
   const [prompt, setPrompt] = useState("");
-  const [playing, setPlaying] = useState(true);
+  const [selectedAtom, setSelectedAtom] = useState(null);
 
   const generateScene = () => {
     if (!prompt.trim()) return;
 
-    alert("Scene generation will be connected in the next phase!");
-  };
-
-  const resetScene = () => {
-    setPlaying(false);
-    setPrompt("");
+    alert(
+      "Custom scene generation is our next development milestone!"
+    );
   };
 
   return (
     <main className="workspace">
       <section className="welcome">
-        <p className="eyebrow">EXPLORE THE SCIENCE OF LIFE</p>
+        <p className="eyebrow">
+          EXPLORE THE SCIENCE OF LIFE
+        </p>
 
         <h1>Biology, brought to life.</h1>
 
         <p>
-          Turn biological concepts into interactive 3D experiences.
+          Explore real biological structures in interactive 3D.
         </p>
       </section>
 
@@ -38,13 +37,9 @@ export default function Workspace() {
       />
 
       <div className="exploration-grid">
-        <Viewer
-          playing={playing}
-          setPlaying={setPlaying}
-          onReset={resetScene}
-        />
+        <Viewer onSelect={setSelectedAtom} />
 
-        <Inspector />
+        <Inspector selectedAtom={selectedAtom} />
       </div>
     </main>
   );
