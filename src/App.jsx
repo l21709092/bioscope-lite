@@ -1,9 +1,9 @@
 
 import { useState } from "react";
 
-import Header from "./components/Header";
-import Sidebar from "./components/Sidebar";
-import Workspace from "./components/Workspace";
+import Header from "./components/header";
+import Sidebar from "./components/sidebar";
+import Workspace from "./components/workspace";
 
 import "./index.css";
 
