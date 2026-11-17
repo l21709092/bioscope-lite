@@ -4,7 +4,7 @@ import * as THREE from "three";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import { MeshoptDecoder } from "three/addons/libs/meshopt_decoder.module.js";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
-import { ANATOMY_BY_KEY, modelUrl } from "./anatomyData";
+import { ANATOMY_BY_KEY, modelUrl } from "./anatomydata";
 
 export default function AnatomyViewer({
   sex,

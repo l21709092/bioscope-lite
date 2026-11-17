@@ -1,13 +1,13 @@
 
 import { useMemo, useState } from "react";
-import AnatomyViewer from "./AnatomyViewer";
-import AnatomyControls from "./AnatomyControls";
-import AnatomyInspector from "./AnatomyInspector";
+import AnatomyViewer from "./anatomyviewer";
+import AnatomyControls from "./anatomycontrols";
+import AnatomyInspector from "./anatomyinspector";
 import {
   ANATOMY_STRUCTURES,
   SYSTEM_KEYS,
   ATTRIBUTION,
-} from "./anatomyData";
+} from "./anatomydata";
 import "./AnatomyLab.css";
 
 export default function AnatomyLab() {

@@ -49,6 +49,141 @@ export default function Viewer({ onSelect }) {
 
         viewer.zoomTo();
 
+        // --------------------------------
+        // PROGRESSIVE MOLECULAR LABELLING
+        // --------------------------------
+
+        let currentLabelLevel = -1;
+
+        // 3Dmol's default camera Z position is 150.
+        // The fourth getView() value represents the
+        // molecular zoom position.
+        const initialView = viewer.getView();
+        const initialDistance = 150 - initialView[3];
+
+        const atoms = viewer.selectedAtoms({});
+
+        function getLabelLevel(view) {
+          const currentDistance = 150 - view[3];
+
+          const zoomRatio = currentDistance / initialDistance;
+
+          if (zoomRatio <= 0.28) return 3;
+          if (zoomRatio <= 0.48) return 2;
+          if (zoomRatio <= 0.72) return 1;
+
+          return 0;
+        }
+
+        function createLabel(text, atom, fontSize = 11) {
+          viewer.addLabel(
+            text,
+            {
+              position: {
+                x: atom.x,
+                y: atom.y,
+                z: atom.z
+              },
+              fontSize,
+              fontColor: "#e2e8f0",
+              backgroundColor: "#0b1220",
+              backgroundOpacity: 0.8,
+              borderThickness: 0,
+              showBackground: true,
+              inFront: true
+            }
+          );
+        }
+
+        function updateMolecularLabels(view) {
+          const nextLevel = getLabelLevel(view);
+
+          // Don't rebuild labels unless the zoom tier changes.
+          if (nextLevel === currentLabelLevel) return;
+
+          currentLabelLevel = nextLevel;
+
+          viewer.removeAllLabels();
+
+          // LEVEL 0: No labels.
+          if (nextLevel === 0) {
+            viewer.render();
+            return;
+          }
+
+          // LEVEL 1: Identify the two DNA strands.
+          if (nextLevel >= 1) {
+            const chains = [...new Set(
+              atoms.map(atom => atom.chain)
+            )];
+
+            chains.forEach((chain, index) => {
+              const phosphorus = atoms.find(
+                atom =>
+                  atom.chain === chain &&
+                  atom.atom.trim() === "P"
+              );
+
+              if (phosphorus) {
+                createLabel(
+                  `DNA STRAND ${index + 1}`,
+                  phosphorus,
+                  13
+                );
+              }
+            });
+          }
+
+          // LEVEL 2: Identify individual nucleotides.
+          if (nextLevel >= 2) {
+            const labelledResidues = new Set();
+
+            atoms.forEach(atom => {
+              if (atom.atom.trim() !== "C1'") return;
+
+              const residueKey =
+                `${atom.chain}-${atom.resi}`;
+
+              if (labelledResidues.has(residueKey)) return;
+
+              labelledResidues.add(residueKey);
+
+              createLabel(
+                `${atom.resn} ${atom.resi}`,
+                atom,
+                10
+              );
+            });
+          }
+
+          // LEVEL 3: Identify individual heavy atoms.
+          if (nextLevel >= 3) {
+            atoms.forEach(atom => {
+              const element = (atom.elem || "").toUpperCase();
+
+              if (!["C", "N", "O", "P", "S"].includes(element)) {
+                return;
+              }
+
+              createLabel(
+                `${atom.atom.trim()} · ${atom.resi}`,
+                atom,
+                9
+              );
+            });
+          }
+
+          viewer.render();
+        }
+
+        // This callback responds to actual camera changes,
+        // including mouse, touch and programmatic zoom.
+        viewer.setViewChangeCallback((view) => {
+          if (!cancelled) {
+            updateMolecularLabels(view);
+          }
+        });
+
         viewer.setClickable({}, true, (atom) => {
           const selected = {
             atom: atom.atom,
@@ -60,20 +195,28 @@ export default function Viewer({ onSelect }) {
 
           onSelect(selected);
 
-          viewer.zoomTo({
-            chain: atom.chain,
-            resi: atom.resi
-          }, 500);
+          viewer.zoomTo(
+            {
+              chain: atom.chain,
+              resi: atom.resi
+            },
+            500
+          );
 
           viewer.render();
         });
 
         viewer.render();
+
         viewerRef.current = viewer;
         setLoading(false);
+
       } catch (err) {
         if (!cancelled) {
-          setError(err.message || "Something went wrong loading DNA.");
+          setError(
+            err.message || "Something went wrong loading DNA."
+          );
+
           setLoading(false);
         }
       }
@@ -82,14 +225,18 @@ export default function Viewer({ onSelect }) {
     loadMolecule();
 
     return () => {
-  cancelled = true;
+      cancelled = true;
 
-  if (viewer && typeof viewer.clear === "function") {
-    viewer.clear();
-  }
+      if (viewer) {
+        viewer.setViewChangeCallback(null);
 
-  viewerRef.current = null;
-};
+        if (typeof viewer.clear === "function") {
+          viewer.clear();
+        }
+      }
+
+      viewerRef.current = null;
+    };
   }, [onSelect]);
 
   const handleMouseMove = (event) => {
@@ -131,6 +278,7 @@ export default function Viewer({ onSelect }) {
           <span className="live-dot" />
           LIVE MOLECULAR VIEWER
         </div>
+
         <span>DNA · PDB: 1BNA</span>
       </div>
 

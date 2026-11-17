@@ -1,0 +1,212 @@
+
+.molecular-viewer-section {
+  position: relative;
+  width: 100%;
+  min-width: 0;
+  min-height: 520px;
+  overflow: hidden;
+  background: #101a24;
+  border: 1px solid #263945;
+  border-radius: 12px;
+}
+
+.molecular-viewer-canvas {
+  position: relative;
+  width: 100%;
+  height: 520px;
+  min-height: 520px;
+}
+
+.molecular-viewer-status {
+  position: absolute;
+  z-index: 10;
+  top: 12px;
+  left: 12px;
+  padding: 9px 13px;
+  color: #c9e3e5;
+  background: #172b34;
+  border: 1px solid #36515c;
+  border-radius: 8px;
+  font-size: 12px;
+  pointer-events: none;
+}
+
+.chemical-viewer-section {
+  position: relative;
+  width: 100%;
+  min-height: 520px;
+  overflow: hidden;
+  background: #101a24;
+  border: 1px solid #263945;
+  border-radius: 12px;
+}
+
+.chemical-viewer-canvas {
+  width: 100%;
+  height: 520px;
+}
+
+.chemical-viewer-status {
+  position: absolute;
+  z-index: 5;
+  top: 12px;
+  left: 12px;
+  padding: 10px 14px;
+  color: #c9e3e5;
+  background: #172b34;
+  border-radius: 8px;
+  font-size: 12px;
+  pointer-events: none;
+}
+
+/* Molecular learning panel */
+
+.molecular-learning-panel {
+  margin-top: 20px;
+  padding: 22px;
+  color: #e7f2f4;
+  background: #121d27;
+  border: 1px solid #263945;
+  border-radius: 12px;
+}
+
+.learning-eyebrow {
+  color: #65c9c3;
+  font-size: 11px;
+  letter-spacing: 2px;
+}
+
+.molecular-learning-panel h2 {
+  margin: 12px 0 22px;
+}
+
+.molecular-learning-panel h3 {
+  margin: 18px 0 8px;
+  color: #c9e3e5;
+  font-size: 15px;
+}
+
+.molecular-learning-panel p {
+  color: #a8bac4;
+  line-height: 1.7;
+  font-size: 14px;
+}
+
+.learning-concepts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
+}
+
+.learning-concepts span {
+  padding: 8px 12px;
+  color: #c9e3e5;
+  background: #172b34;
+  border: 1px solid #36515c;
+  border-radius: 20px;
+  font-size: 12px;
+}
+
+.learning-disclaimer {
+  margin-top: 22px;
+  font-size: 11px !important;
+}
+
+/* Saved structures and history */
+
+.molecular-saved-section {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+  margin-top: 30px;
+}
+
+.molecular-saved-group {
+  min-width: 0;
+  padding: 18px;
+  background: #121d27;
+  border: 1px solid #263945;
+  border-radius: 12px;
+}
+
+.molecular-saved-group h2 {
+  font-size: 17px;
+}
+
+.molecular-saved-group p {
+  color: #91a4b2;
+  font-size: 13px;
+}
+
+.molecular-saved-list {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+
+.molecular-saved-list button {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 12px;
+  text-align: left;
+  color: #e7f2f4;
+  background: #17232d;
+  border: 1px solid #263945;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.molecular-saved-list button:hover {
+  border-color: #36b8b0;
+}
+
+.molecular-saved-list small {
+  color: #91a4b2;
+}
+
+.molecular-source-errors {
+  margin: 16px 0;
+  padding: 14px;
+  color: #ffb4a9;
+  background: #291b20;
+  border: 1px solid #63383d;
+  border-radius: 9px;
+  font-size: 13px;
+}
+
+.molecular-explorer-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.molecular-explorer-heading button {
+  padding: 10px 14px;
+  color: #c9e3e5;
+  background: #172b34;
+  border: 1px solid #36515c;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.molecular-explorer-main {
+  min-width: 0;
+}
+
+@media (max-width: 650px) {
+  .molecular-saved-section {
+    grid-template-columns: 1fr;
+  }
+}
+.model-card-open {
+  display: inline-block;
+  margin-top: 10px;
+  color: #65c9c3;
+  font-size: 12px;
+}
+
+

@@ -1,5 +1,5 @@
 
-import { SYSTEM_KEYS, SYSTEM_LABELS } from "./anatomyData";
+import { SYSTEM_KEYS, SYSTEM_LABELS } from "./anatomydata";
 
 export default function AnatomyControls({
   sex,

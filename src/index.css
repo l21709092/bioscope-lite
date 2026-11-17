@@ -613,21 +613,3 @@ button {
     margin-bottom: 8px;
   }
 }
-
-.app {
-  min-height: 100vh;
-  background: #07111d;
-}
-
-.app-layout {
-  display: flex;
-  min-height: calc(100vh - 70px);
-}
-
-.app-layout > * {
-  min-width: 0;
-}
-
-.app-layout > main {
-  flex: 1;
-}

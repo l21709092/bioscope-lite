@@ -1,5 +1,5 @@
 
-import { getStructure, SYSTEM_LABELS } from "./anatomyData";
+import { getStructure, SYSTEM_LABELS } from "./anatomydata";
 
 export default function AnatomyInspector({ selectedKey, onClear }) {
   const structure = getStructure(selectedKey);
