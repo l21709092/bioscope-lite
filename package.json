@@ -15,7 +15,6 @@
     "3dmol": "^2.5.5",
     "gsap": "^3.15.1",
     "lucide-react": "^1.73.0",
-    "open-anatomy-3d": "^0.1.0",
     "react": "^19.3.1",
     "react-dom": "^19.3.1",
     "three": "^0.187.0"
