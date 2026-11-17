@@ -1,12 +1,12 @@
-
+﻿
 import {
   Search,
   Compass,
   Dna,
-  Microscope,
   Brain,
   Leaf,
   HeartPulse,
+  ShieldCheck,
   History,
   Bookmark,
   Atom
@@ -14,10 +14,10 @@ import {
 
 const categories = [
   { id: "Molecular Biology", icon: Dna },
-  { id: "Cell Biology", icon: Microscope },
   { id: "Neuroscience", icon: Brain },
   { id: "Botany", icon: Leaf },
-  { id: "Human Physiology", icon: HeartPulse }
+  { id: "Human Physiology", icon: HeartPulse },
+  { id: "Immunology", icon: ShieldCheck }
 ];
 
 export default function Sidebar({
