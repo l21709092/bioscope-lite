@@ -4,6 +4,8 @@ import Viewer from "./viewer";
 import Inspector from "./inspector";
 
 const ImmunologyHub = lazy(() => import("../immunology/ImmunologyHub"));
+const MolecularBiologyHub = lazy(() => import("../molecular-biology/MolecularBiologyHub"));
+const BotanyHub = lazy(() => import("../botany/BotanyHub"));
 
 export default function Workspace({ activeSection = "Explore" }) {
   const [prompt, setPrompt] = useState("");
@@ -11,6 +13,14 @@ export default function Workspace({ activeSection = "Explore" }) {
 
   if (activeSection === "Immunology") {
     return <Suspense fallback={<main className="immunology-loading">Loading Immunology lab…</main>}><ImmunologyHub /></Suspense>;
+  }
+
+  if (activeSection === "Molecular Biology") {
+    return <Suspense fallback={<main className="molecular-loading">Loading Molecular Biology lab…</main>}><MolecularBiologyHub /></Suspense>;
+  }
+
+  if (activeSection === "Botany") {
+    return <Suspense fallback={<main className="botany-loading">Loading Botany lab…</main>}><BotanyHub /></Suspense>;
   }
 
   const generateScene = () => {

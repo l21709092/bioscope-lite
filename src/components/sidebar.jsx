@@ -5,7 +5,6 @@ import {
   Dna,
   Brain,
   Leaf,
-  HeartPulse,
   ShieldCheck,
   History,
   Bookmark,
@@ -16,7 +15,6 @@ const categories = [
   { id: "Molecular Biology", icon: Dna },
   { id: "Neuroscience", icon: Brain },
   { id: "Botany", icon: Leaf },
-  { id: "Human Physiology", icon: HeartPulse },
   { id: "Immunology", icon: ShieldCheck }
 ];
 
