@@ -6,6 +6,7 @@ import {
   Microscope,
   Brain,
   Leaf,
+  Bone,
   HeartPulse,
   History,
   Bookmark,
@@ -17,6 +18,7 @@ const categories = [
   { id: "Cell Biology", icon: Microscope },
   { id: "Neuroscience", icon: Brain },
   { id: "Botany", icon: Leaf },
+  { id: "Human Anatomy", icon: Bone },
   { id: "Human Physiology", icon: HeartPulse }
 ];
 

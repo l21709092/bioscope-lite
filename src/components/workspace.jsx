@@ -3,10 +3,15 @@ import { useState } from "react";
 import PromptBar from "./promptbar";
 import Viewer from "./viewer";
 import Inspector from "./inspector";
+import AnatomySection from "../anatomy/AnatomySection";
 
-export default function Workspace() {
+export default function Workspace({ activeSection = "Explore", searchQuery = "" }) {
   const [prompt, setPrompt] = useState("");
   const [selectedAtom, setSelectedAtom] = useState(null);
+
+  if (activeSection === "Human Anatomy") {
+    return <AnatomySection searchQuery={searchQuery} />;
+  }
 
   const generateScene = () => {
     if (!prompt.trim()) return;
