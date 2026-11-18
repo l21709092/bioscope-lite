@@ -1,13 +1,29 @@
 
-import { useState } from "react";
+import { lazy, Suspense, useState } from "react";
 import PromptBar from "./promptbar";
 import Viewer from "./viewer";
 import Inspector from "./inspector";
 import AnatomySection from "../anatomy/AnatomySection";
 
+const ImmunologyHub = lazy(() => import("../immunology/ImmunologyHub"));
+const MolecularBiologyHub = lazy(() => import("../molecular-biology/MolecularBiologyHub"));
+const BotanyHub = lazy(() => import("../botany/BotanyHub"));
+
 export default function Workspace({ activeSection = "Explore", searchQuery = "" }) {
   const [prompt, setPrompt] = useState("");
   const [selectedAtom, setSelectedAtom] = useState(null);
+
+  if (activeSection === "Immunology") {
+    return <Suspense fallback={<main className="immunology-loading">Loading Immunology lab…</main>}><ImmunologyHub /></Suspense>;
+  }
+
+  if (activeSection === "Molecular Biology") {
+    return <Suspense fallback={<main className="molecular-loading">Loading Molecular Biology lab…</main>}><MolecularBiologyHub searchQuery={searchQuery} /></Suspense>;
+  }
+
+  if (activeSection === "Botany") {
+    return <Suspense fallback={<main className="botany-loading">Loading Botany lab…</main>}><BotanyHub /></Suspense>;
+  }
 
   if (activeSection === "Human Anatomy") {
     return <AnatomySection searchQuery={searchQuery} />;
