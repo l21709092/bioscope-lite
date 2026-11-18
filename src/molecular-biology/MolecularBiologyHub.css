@@ -1,0 +1,215 @@
+.molecular-loading { padding: 48px; color: #b8c9d7; }
+.molecular-hub {
+  --mb-line: #26394d; --mb-muted: #a5b5c6; --mb-teal: #66ded0; --mb-card: #101b2c;
+  width: 100%; max-width: 1540px; min-width: 0; margin: 0 auto; padding: 30px clamp(14px, 3vw, 42px) 46px;
+  color: #edf4ff; font-family: 'DM Sans', sans-serif;
+}
+.molecular-hub button, .molecular-hub select { font: inherit; }
+.mb-header { display: flex; align-items: center; justify-content: space-between; gap: 24px; margin-bottom: 25px; }
+.mb-header h1 { margin: 9px 0 8px; font: 600 clamp(26px, 3vw, 38px) 'Space Grotesk', sans-serif; letter-spacing: -.7px; }
+.mb-header p:not(.mb-kicker) { max-width: 630px; margin: 0; color: var(--mb-muted); font-size: 13px; line-height: 1.6; }
+.mb-kicker { color: #6fdacf; font-size: 9px; font-weight: 700; letter-spacing: 1.45px; }
+.mb-progress-card { width: 214px; min-width: 214px; display: grid; grid-template-columns: auto 1fr; align-items: center; gap: 8px 11px; padding: 12px; border: 1px solid var(--mb-line); border-radius: 10px; background: #0f1b2a; color: #7ce0d5; }
+.mb-progress-card span { display: flex; align-items: baseline; gap: 7px; }
+.mb-progress-card strong { color: #ecf8f7; font: 600 16px 'Space Grotesk', sans-serif; }
+.mb-progress-card small { color: #91a4b7; font-size: 9px; }
+.mb-progress-card > i { grid-column: 1 / -1; height: 4px; border-radius: 5px; background: #25384c; overflow: hidden; }
+.mb-progress-card > i b { display: block; height: 100%; border-radius: inherit; background: #61d9cb; transition: width .25s ease; }
+.mb-nav { display: flex; flex-wrap: wrap; gap: 5px; padding: 5px; border: 1px solid var(--mb-line); border-radius: 10px; background: #0d1725; margin-bottom: 18px; }
+.mb-nav button, .mb-tab-switch button { display: inline-flex; align-items: center; justify-content: center; gap: 7px; flex-shrink: 0; padding: 9px 12px; color: #a9bbcd; background: transparent; border: 1px solid transparent; border-radius: 7px; font-size: 11px; cursor: pointer; transition: .16s ease; }
+.mb-nav button:hover, .mb-tab-switch button:hover { color: #e9f9f7; background: #16283a; }
+.mb-nav button.active, .mb-tab-switch button.active { border-color: #285f64; color: #79e4d8; background: #14313a; }
+.mb-hero { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(230px, .65fr); gap: 20px; align-items: stretch; padding: clamp(22px, 4vw, 42px); border: 1px solid #294157; border-radius: 14px; background: radial-gradient(ellipse at 84% 48%, #173646 0, #101d30 38%, #101a2a 75%); overflow: hidden; }
+.mb-hero-copy h2 { max-width: 660px; margin: 14px 0 11px; font: 600 clamp(25px, 3.4vw, 39px) 'Space Grotesk', sans-serif; line-height: 1.17; }
+.mb-hero-copy p { max-width: 650px; color: #aebed0; font-size: 13px; line-height: 1.7; }
+.mb-hero-actions { display: flex; flex-wrap: wrap; gap: 9px; margin-top: 23px; }
+.mb-primary-button, .mb-secondary-button, .mb-text-button, .mb-question-actions > button, .dna-learning-actions > button, .dna-process-controls > button, .mb-order-challenge button, .dna-structure-tools button {
+  display: inline-flex; align-items: center; justify-content: center; gap: 7px; min-height: 36px; padding: 8px 12px; border: 1px solid #34495e; border-radius: 7px; background: #17263a; color: #dce8f5; font-size: 11px; cursor: pointer; transition: .16s ease;
+}
+.mb-primary-button { border-color: #53c8bb; background: #65ddd0; color: #09202a; font-weight: 700; }
+.mb-primary-button:hover:not(:disabled) { background: #8af0e4; }
+.mb-secondary-button:hover, .mb-text-button:hover, .mb-question-actions > button:hover, .dna-learning-actions > button:hover, .dna-process-controls > button:hover:not(:disabled), .mb-order-challenge button:hover:not(:disabled) { border-color: #59c9bd; color: #79e4d8; }
+.mb-primary-button:disabled, .mb-secondary-button:disabled, .mb-question-actions button:disabled, .dna-learning-actions button:disabled, .dna-process-controls button:disabled { cursor: not-allowed; opacity: .44; }
+.mb-hero-art { display: grid; position: relative; place-items: center; min-height: 190px; color: #72e0d5; }
+.mb-hero-art > svg { position: relative; z-index: 1; filter: drop-shadow(0 0 23px #46b8b288); }
+.mb-hero-art > span { position: absolute; z-index: 2; bottom: 11px; color: #afc8d3; font-size: 8px; font-weight: 700; letter-spacing: 1.3px; }
+.mb-orbit { position: absolute; width: 180px; height: 115px; border: 1px solid #4ea9ad66; border-radius: 50%; transform: rotate(-35deg); }
+.mb-orbit.orbit-two { width: 210px; height: 84px; transform: rotate(47deg); border-color: #8872c755; }
+.mb-overview-section { margin-top: 27px; }
+.mb-panel-heading { display: flex; align-items: center; justify-content: space-between; gap: 14px; margin-bottom: 16px; }
+.mb-panel-heading h2 { margin: 5px 0 0; font: 600 21px 'Space Grotesk', sans-serif; }
+.mb-text-button { min-height: 32px; padding: 6px 8px; border: 0; background: transparent; }
+.mb-feature-grid { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 11px; }
+.mb-feature-card { --structure-accent: #66ded0; position: relative; display: flex; min-height: 204px; flex-direction: column; align-items: flex-start; padding: 16px 14px; border: 1px solid var(--mb-line); border-radius: 10px; background: linear-gradient(150deg, color-mix(in srgb, var(--structure-accent) 11%, #101b2c), #101b2c 64%); color: #e9f1fa; text-align: left; cursor: pointer; transition: transform .18s ease, border-color .18s ease; }
+.mb-feature-card:hover { transform: translateY(-2px); border-color: color-mix(in srgb, var(--structure-accent) 72%, #26394d); }
+.mb-feature-number { color: var(--structure-accent); font: 600 10px 'Space Grotesk', sans-serif; }
+.mb-feature-category { margin-top: 15px; color: #8297ac; font-size: 8px; text-transform: uppercase; letter-spacing: 1px; }
+.mb-feature-card h3 { margin: 6px 0; font: 600 14px 'Space Grotesk', sans-serif; }
+.mb-feature-card p { margin: 0 0 12px; color: #9faec0; font-size: 10px; line-height: 1.5; }
+.mb-feature-action { display: inline-flex; align-items: center; gap: 4px; margin-top: auto; color: var(--structure-accent); font-size: 10px; font-weight: 700; }
+.mb-path-row { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-top: 15px; }
+.mb-path-row > button { display: flex; align-items: center; gap: 12px; padding: 14px; border: 1px solid var(--mb-line); border-radius: 9px; background: #101b2b; color: #70dacf; text-align: left; cursor: pointer; }
+.mb-path-row > button:hover { border-color: #4b9c9b; background: #142738; }
+.mb-path-row > button span { flex: 1; display: grid; gap: 4px; }
+.mb-path-row strong { color: #e2edf8; font-size: 11px; }
+.mb-path-row small { color: #96a9bc; font-size: 9px; }
+.mb-search-note { color: #8197ac; font-size: 10px; }
+.mb-card { padding: clamp(16px, 2.4vw, 24px); border: 1px solid var(--mb-line); border-radius: 12px; background: var(--mb-card); }
+.mb-intro-copy { max-width: 840px; margin: -3px 0 13px; color: #9eafc1; font-size: 11px; line-height: 1.65; }
+.mb-tab-switch { display: flex; gap: 4px; padding: 4px; border: 1px solid var(--mb-line); border-radius: 8px; background: #0c1725; }
+.mb-tab-switch button { min-height: 31px; padding: 6px 10px; font-size: 10px; }
+.dna-component-list { display: flex; flex-wrap: wrap; gap: 6px; margin: 12px 0; }
+.dna-component-list button { display: inline-flex; align-items: center; gap: 6px; padding: 7px 9px; border: 1px solid #2a3e53; border-radius: 7px; background: #111d2b; color: #aebed0; font-size: 9px; cursor: pointer; }
+.dna-component-list button:hover, .dna-component-list button.active { border-color: #52c2b8; color: #80e3da; background: #15333a; }
+.dna-component-dot { width: 7px; height: 7px; border-radius: 50%; background: #75aaff; }
+.dna-component-dot.adenine { background: #43bce5; }.dna-component-dot.thymine { background: #f5a64e; }.dna-component-dot.guanine { background: #a58cf5; }.dna-component-dot.cytosine { background: #65d49b; }.dna-component-dot.hydrogenBonds { background: #70e4df; }.dna-component-dot.nucleotide { background: #e4d17d; }.dna-component-dot.basePair { background: #c1d1e5; }
+.dna-explorer-layout { display: grid; grid-template-columns: minmax(0, 1fr) 265px; gap: 12px; align-items: start; }
+.dna-structure-column { min-width: 0; }
+.dna-structure-tools { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin: 7px 0; }
+.dna-structure-tools button, .dna-structure-tools a { display: inline-flex; align-items: center; gap: 5px; min-height: 29px; padding: 5px 8px; border: 1px solid #30475a; border-radius: 6px; background: #132235; color: #b8c9d8; font-size: 9px; text-decoration: none; cursor: pointer; }
+.dna-structure-tools button:hover, .dna-structure-tools a:hover { border-color: #54c8bd; color: #73e0d5; }
+.dna-structure-tools a { margin-left: auto; }
+.dna-structure-column .viewer-panel { overflow: hidden; }
+.dna-structure-column .viewer-top { min-height: 42px; align-items: center; padding: 10px 14px; }
+.dna-structure-column .molecule-stage { min-height: 350px; height: 430px; }
+.dna-structure-column .molecule-canvas { min-height: 350px; }
+.dna-structure-column .viewer-controls { padding: 10px; gap: 6px; }
+.dna-structure-column .viewer-controls button { min-height: 31px; padding: 6px 8px; font-size: 10px; }
+.dna-structure-column .viewer-hint { padding: 0 11px 11px; font-size: 9px; }
+.dna-live-tag { display: inline-flex; align-items: center; gap: 7px; padding: 7px 10px; border: 1px solid #23534f; border-radius: 999px; background: #102b30; color: #67e8d7; font-size: 9px; letter-spacing: .55px; white-space: nowrap; }
+.dna-live-tag i { width: 7px; height: 7px; border-radius: 50%; background: #34d399; box-shadow: 0 0 9px #34d39988; }
+.dna-view-modes { display: flex; flex-wrap: wrap; gap: 6px; padding: 10px 12px 4px; }
+.dna-structure-column .dna-view-modes button { display: inline-flex; align-items: center; justify-content: center; min-height: 30px; padding: 6px 11px; border: 1px solid #2a3b53; border-radius: 7px; background: #142236; color: #b9c7d9; font-size: 10px; cursor: pointer; transition: .16s ease; }
+.dna-structure-column .dna-view-modes button:hover { border-color: #367d79; color: #dffbf6; }
+.dna-structure-column .dna-view-modes button.selected { border-color: #287f79; background: #15363b; color: #67e8d7; }
+.dna-structure-column .dna-viewer-controls { align-items: center; flex-wrap: wrap; }
+.dna-structure-column .dna-viewer-controls button { display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-height: 32px; padding: 6px 9px; border: 1px solid #2a3b53; border-radius: 7px; background: #142236; color: #b9c7d9; cursor: pointer; }
+.dna-structure-column .dna-viewer-controls button:hover { border-color: #367d79; color: #67e8d7; }
+.dna-pan-controls { display: inline-flex; gap: 3px; padding: 2px; border: 1px solid #293b52; border-radius: 7px; background: #0d1826; }
+.dna-structure-column .dna-pan-controls button { width: 28px; min-width: 28px; min-height: 28px; padding: 5px; border: 0; background: transparent; }
+.dna-inspector-function { margin-top: 14px; padding: 10px 12px; border-left: 3px solid #54d6c8; background: #142536; }
+.dna-inspector-function strong { color: #dbeafe; font-size: 10px; }
+.dna-inspector-function p { margin: 5px 0 0; color: #aab8cb; font-size: 10px; line-height: 1.65; }
+.dna-inspector-properties { margin-top: 9px; padding: 9px 10px; border: 1px solid #293e53; border-radius: 7px; background: #111f31; }
+.dna-inspector-properties summary { color: #73dacf; font-size: 10px; cursor: pointer; }
+.dna-inspector-properties p { margin: 8px 0 0; color: #aab8cb; font-size: 10px; line-height: 1.65; }
+.viewer-unavailable { overflow: hidden; }
+.viewer-unavailable .viewer-placeholder { min-height: 410px; background: radial-gradient(ellipse at center, #183346 0%, #101a2b 48%, #101a2b 100%); }
+.viewer-unavailable .viewer-message { max-width: 350px; }
+.viewer-unavailable .viewer-message h2 { color: #eef4ff; font-size: 21px; }
+.viewer-unavailable .viewer-message p { line-height: 1.65; }
+.dna-inspector { min-height: 285px; padding: 17px; border: 1px solid #2a4055; border-radius: 9px; background: #0d1826; }
+.dna-inspector h3 { margin: 8px 0 5px; font: 600 19px 'Space Grotesk', sans-serif; }
+.dna-inspector > strong { color: #70ded2; font-size: 10px; }
+.dna-inspector > p { color: #b3c3d2; font-size: 11px; line-height: 1.7; }
+.dna-inspector details { margin-top: 12px; padding: 10px; border-radius: 7px; background: #142337; }
+.dna-inspector summary, .dna-learning-explanation summary { display: flex; align-items: center; gap: 6px; color: #73dacf; font-size: 10px; cursor: pointer; }
+.dna-inspector details p { margin: 8px 0 0; color: #9fb1c3; font-size: 10px; line-height: 1.6; }
+.dna-atom-meta { display: grid; grid-template-columns: 1fr auto; gap: 7px; margin-top: 13px; padding: 10px; border: 1px solid #283d51; border-radius: 7px; font-size: 9px; }
+.dna-atom-meta span { color: #91a4b7; }.dna-atom-meta b { color: #deebf5; text-align: right; }
+.dna-inference-note { padding: 8px; border-left: 2px solid #61d8cc; background: #14283a; }
+.dna-color-key { display: flex; flex-wrap: wrap; gap: 9px; margin-top: 14px; }
+.dna-color-key span { display: inline-flex; align-items: center; gap: 5px; color: #9eb1c4; font-size: 8px; }
+.dna-color-key i { width: 7px; height: 7px; border-radius: 50%; background: #43bce5; }.dna-color-key i.t { background: #f5a64e; }.dna-color-key i.g { background: #a58cf5; }.dna-color-key i.c { background: #65d49b; }
+.dna-source-note, .dna-process-footnote, .mb-structure-note { margin: 8px 2px 0; color: #758ba1; font-size: 9px; line-height: 1.55; }
+.dna-fallback-wrap { margin-top: 11px; padding: 12px; border: 1px dashed #45627b; border-radius: 9px; background: #0e1a28; }
+.dna-fallback-wrap > div:first-child { display: grid; gap: 5px; }
+.dna-fallback-wrap strong { color: #e3edf7; font-size: 11px; }.dna-fallback-wrap span { color: #9fb0c0; font-size: 10px; line-height: 1.5; }
+.dna-fallback-svg { display: block; width: min(100%, 360px); height: auto; margin: 8px auto 0; overflow: visible; }
+.dna-svg-caption { fill: #8da5ba; font-size: 7px; letter-spacing: 1px; }.dna-svg-rail { fill: #dbe9f6; font-size: 9px; }
+.dna-fallback-rung { stroke: #91a9bd; stroke-width: 2; cursor: pointer; }.dna-fallback-rung.selected { stroke: #fff09a; stroke-width: 4; }
+.dna-fallback-base { cursor: pointer; outline: none; }.dna-fallback-base rect { fill: #1b3045; stroke: #69819a; stroke-width: 1; }.dna-fallback-base text { fill: #e7f0f8; font-size: 10px; font-weight: 700; pointer-events: none; }.dna-fallback-base.selected rect, .dna-fallback-base:hover rect { stroke: #fff09a; stroke-width: 2; }.dna-fallback-hbond { fill: #75e4dc; }
+.dna-visuals-intro { padding-top: 8px; }
+.dna-process-workspace { padding-top: 7px; }
+.dna-process-tabs { display: flex; flex-wrap: wrap; gap: 7px; margin: 6px 0 13px; }
+.dna-process-tabs button { min-height: 34px; padding: 7px 11px; border: 1px solid #2b4054; border-radius: 7px; background: #121f31; color: #aabacc; font-size: 10px; cursor: pointer; }
+.dna-process-tabs button.active, .dna-process-tabs button:hover { border-color: #56c9bd; color: #73e0d5; background: #16343a; }
+.dna-process-layout { display: grid; grid-template-columns: minmax(0, 1fr) 275px; gap: 12px; }
+.dna-process-canvas-wrap { position: relative; min-height: 370px; height: 410px; overflow: hidden; border: 1px solid #253b50; border-radius: 9px; background: radial-gradient(ellipse, #162a3d, #09121e 75%); }
+.dna-process-canvas { width: 100%; height: 100%; }
+.dna-process-stage-badge { position: absolute; top: 11px; left: 11px; padding: 7px 9px; border: 1px solid #35536b; border-radius: 6px; background: #0a1723e8; color: #89e1d6; font-size: 8px; letter-spacing: 1px; pointer-events: none; }
+.mb-scene-tag { display: block; max-width: 170px; padding: 4px 6px; border: 1px solid #456176; border-radius: 4px; background: #0a1723e8; color: #d9e9f4; font: 600 8px 'DM Sans', sans-serif; line-height: 1.35; letter-spacing: .45px; text-align: center; white-space: normal; pointer-events: none; }
+.mb-codon-tag { min-width: 32px; font-size: 7px; }
+.dna-process-explanation { padding: 17px; border: 1px solid #263b50; border-radius: 9px; background: #0d1827; }
+.dna-process-explanation h3 { margin: 8px 0; font: 600 18px 'Space Grotesk', sans-serif; }
+.dna-process-explanation > p { color: #b0c0cf; font-size: 11px; line-height: 1.65; }
+.dna-process-explanation details { margin-top: 14px; padding: 10px; border-left: 2px solid #55c7bb; background: #142235; }
+.dna-process-explanation summary { color: #78dbd0; font-size: 10px; cursor: pointer; }
+.dna-process-explanation details p { color: #a0b2c3; font-size: 10px; line-height: 1.55; }
+.dna-process-progress { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 14px; }
+.dna-process-progress button { width: 25px; height: 25px; border: 1px solid #344b61; border-radius: 50%; background: #111f30; color: #95a9bd; font-size: 9px; cursor: pointer; }
+.dna-process-progress button.current { border-color: #64dbd0; background: #1e5557; color: white; }.dna-process-progress button.done { color: #78dfc1; border-color: #427f73; }
+.dna-process-controls { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 7px; margin-top: 12px; }
+.dna-process-controls label { display: inline-flex; align-items: center; gap: 6px; color: #a4b5c6; font-size: 10px; }
+.dna-process-controls select { padding: 6px 8px; border: 1px solid #334a5d; border-radius: 6px; background: #152439; color: #dfeaf4; }
+.dna-learning-progress-label { display: flex; align-items: baseline; gap: 6px; color: #93a9bd; font-size: 9px; }.dna-learning-progress-label strong { color: #7de1d6; font: 600 17px 'Space Grotesk', sans-serif; }
+.dna-learning-progress { height: 5px; margin: -3px 0 13px; border-radius: 4px; background: #23374b; overflow: hidden; }.dna-learning-progress i { display: block; height: 100%; border-radius: inherit; background: #63d8cb; transition: width .2s ease; }
+.dna-learning-tabs { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 7px; }
+.dna-learning-tabs button { display: inline-flex; align-items: center; gap: 6px; min-width: max-content; padding: 7px 9px; border: 1px solid #293e53; border-radius: 7px; background: #101d2d; color: #9fb0c1; font-size: 9px; cursor: pointer; }
+.dna-learning-tabs button span { display: grid; place-items: center; width: 18px; height: 18px; border-radius: 50%; background: #263c52; color: #dce9f5; }.dna-learning-tabs button.active { border-color: #55c9bd; color: #7be1d6; background: #16343b; }.dna-learning-tabs button.done span { background: #277765; }
+.dna-learning-body { display: grid; grid-template-columns: minmax(0, .85fr) minmax(0, 1.15fr); gap: 12px; margin-top: 12px; }
+.dna-learning-explanation, .dna-learning-check { padding: 17px; border: 1px solid #263b50; border-radius: 9px; background: #0e1928; }
+.dna-learning-explanation > p { margin: 9px 0 14px; color: #d2dfeb; font-size: 14px; line-height: 1.7; }
+.dna-learning-explanation details { padding: 10px; background: #152438; border-radius: 7px; }.dna-learning-explanation details p { color: #a4b5c6; font-size: 10px; line-height: 1.65; }
+.dna-learning-check h3 { margin: 8px 0 13px; font: 600 15px 'Space Grotesk', sans-serif; }
+.dna-learning-options, .mb-question-options { display: grid; gap: 7px; margin-bottom: 11px; }
+.dna-learning-options button, .mb-question-options button { display: flex; align-items: center; gap: 9px; width: 100%; min-height: 38px; padding: 9px; border: 1px solid #2b4055; border-radius: 7px; background: #132135; color: #c2d0de; text-align: left; font-size: 10px; cursor: pointer; }
+.dna-learning-options button.chosen, .mb-question-options button.chosen { border-color: #5dc8bf; background: #17333b; }.dna-learning-options button.correct, .mb-question-options button.correct { border-color: #5ec99a; background: #15372f; }.dna-learning-options button.wrong, .mb-question-options button.wrong { border-color: #d5767e; background: #3a222c; }
+.dna-learning-feedback, .mb-question-feedback { margin: 10px 0; padding: 10px; border-left: 2px solid #5dc89a; background: #15332c; }.dna-learning-feedback.review, .mb-question-feedback.wrong { border-color: #e38385; background: #38232c; }.dna-learning-feedback strong, .mb-question-feedback strong { font-size: 10px; }.dna-learning-feedback p, .mb-question-feedback p { margin: 5px 0 0; color: #aec0d0; font-size: 10px; line-height: 1.55; }
+.dna-learning-actions { display: flex; justify-content: space-between; gap: 8px; margin-top: 12px; }
+.mb-library-layout { display: grid; grid-template-columns: minmax(220px, .73fr) minmax(0, 1.27fr); gap: 13px; }
+.mb-library-list { display: grid; align-content: start; gap: 7px; }
+.mb-library-list > button { display: flex; align-items: flex-start; gap: 10px; width: 100%; padding: 11px; border: 1px solid #2a3f53; border-radius: 8px; background: #0e1928; color: #d4e1ed; text-align: left; cursor: pointer; }
+.mb-library-list > button:hover, .mb-library-list > button.active { border-color: #56c9bd; background: #142b37; }
+.mb-library-list > button > span:last-child { display: grid; gap: 4px; min-width: 0; }.mb-library-list strong { font-size: 10px; }.mb-library-list small { color: #77d5cb; font-size: 8px; text-transform: uppercase; letter-spacing: .8px; }.mb-library-list em { color: #9cacbd; font-size: 9px; font-style: normal; line-height: 1.4; }
+.mb-library-swatch { width: 10px; height: 10px; flex: 0 0 auto; margin-top: 2px; border-radius: 3px; background: var(--structure-accent, #6bd8ce); box-shadow: 0 0 11px color-mix(in srgb, var(--structure-accent, #6bd8ce) 45%, transparent); }
+.mb-library-list .mb-library-dna-link { align-items: center; color: #79dfd4; font-size: 10px; }
+.mb-empty-search { padding: 12px; color: #91a7ba; font-size: 10px; }
+.mb-library-detail { min-width: 0; }
+.mb-structure-canvas { height: 330px; overflow: hidden; border: 1px solid #273d52; border-radius: 9px; background: radial-gradient(ellipse, #193249, #09131f 75%); }
+.mb-structure-canvas-inner { width: 100%; height: 100%; }
+.mb-structure-detail-heading { padding: 14px 2px 0; }.mb-structure-detail-heading h3 { margin: 6px 0; font: 600 18px 'Space Grotesk', sans-serif; }.mb-structure-detail-heading > p { color: #b0c0cf; font-size: 11px; line-height: 1.6; }.mb-structure-detail-heading details { padding: 9px; border-radius: 7px; background: #142236; color: #7ddacf; font-size: 10px; }.mb-structure-detail-heading summary { cursor: pointer; }.mb-structure-detail-heading details p { color: #a4b5c6; line-height: 1.55; }
+.mb-structure-cues { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 11px; }.mb-structure-cues button { display: inline-flex; align-items: center; gap: 5px; padding: 7px 9px; border: 1px solid #2d4358; border-radius: 6px; background: #142235; color: #aebed0; font-size: 9px; cursor: pointer; }.mb-structure-cues button.active, .mb-structure-cues button:hover { border-color: #58cabe; color: #7be0d5; }
+.challenge-mode-switch { width: fit-content; margin-bottom: 15px; }
+.mb-question-card { padding: 16px; border: 1px solid #283e53; border-radius: 9px; background: #0d1827; }
+.mb-question-meta { display: flex; flex-wrap: wrap; gap: 7px; }.mb-question-meta span { padding: 5px 7px; border-radius: 5px; background: #1a2b3e; color: #9db0c2; font-size: 8px; text-transform: uppercase; letter-spacing: .6px; }
+.mb-quiz-progress { display: flex; gap: 3px; margin: 12px 0; }.mb-quiz-progress i { height: 4px; flex: 1; border-radius: 3px; background: #263a4e; }.mb-quiz-progress i.current { background: #62d9cd; }.mb-quiz-progress i.correct { background: #55c69a; }.mb-quiz-progress i.wrong { background: #dc777e; }
+.mb-question-card h3, .mb-order-challenge h3 { margin: 8px 0 14px; font: 600 17px 'Space Grotesk', sans-serif; }
+.mb-question-options button span { display: grid; place-items: center; width: 20px; height: 20px; flex: 0 0 auto; border-radius: 50%; background: #26384c; color: #dce9f5; font-size: 9px; }
+.mb-question-actions { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 7px; margin-top: 12px; }
+.mb-quiz-results { display: grid; grid-template-columns: auto 1fr; align-items: center; gap: 14px; padding: 18px; border: 1px solid #2b4155; border-radius: 9px; background: #0d1827; }
+.mb-score-dial { display: grid; place-items: center; width: 72px; height: 72px; border: 3px solid #5ed5c8; border-radius: 50%; color: #edf8f8; font: 600 22px 'Space Grotesk', sans-serif; }.mb-score-dial span { margin-top: -16px; color: #96adbf; font: 10px 'DM Sans', sans-serif; }
+.mb-quiz-results h3 { margin: 5px 0; font: 600 17px 'Space Grotesk', sans-serif; }.mb-quiz-results p { margin: 0; color: #a6b7c6; font-size: 10px; line-height: 1.55; }
+.mb-topic-results { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 8px; }.mb-topic-results > div { display: grid; grid-template-columns: 1fr auto; gap: 5px; padding: 8px; border-radius: 6px; background: #17263a; color: #aabccc; font-size: 9px; }.mb-topic-results strong { color: #7bddd2; }.mb-topic-results i { grid-column: 1 / -1; display: block; height: 4px; border-radius: 3px; background: #293e51; overflow: hidden; }.mb-topic-results b { display: block; height: 100%; background: #63d8ca; }
+.mb-quiz-results > .mb-primary-button { grid-column: 1 / -1; width: fit-content; }
+.mb-order-challenge { padding: 18px; border: 1px solid #293e53; border-radius: 9px; background: #0d1827; }.mb-order-challenge > p { color: #a9bac9; font-size: 11px; }.mb-order-challenge ol { display: grid; gap: 6px; padding: 0; list-style: none; }.mb-order-challenge li { display: flex; align-items: center; gap: 10px; padding: 8px; border: 1px solid #2a3e52; border-radius: 7px; background: #142236; }.mb-order-challenge li > span { display: grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; background: #273d53; color: #dce8f3; font-size: 9px; }.mb-order-challenge li strong { flex: 1; color: #c8d7e4; font-size: 10px; }.mb-order-challenge li div { display: flex; gap: 4px; }.mb-order-challenge li button { min-height: 27px; padding: 5px; }.mb-order-challenge li button:disabled { opacity: .4; cursor: default; }
+
+@media (max-width: 1050px) {
+  .mb-feature-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .dna-explorer-layout, .dna-process-layout { grid-template-columns: minmax(0, 1fr) 235px; }
+}
+@media (max-width: 760px) {
+  .molecular-hub { padding-top: 18px; }
+  .mb-header { align-items: flex-start; flex-direction: column; }
+  .mb-progress-card { width: 100%; }
+  .mb-hero { grid-template-columns: 1fr; }.mb-hero-art { min-height: 145px; }
+  .mb-feature-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .dna-explorer-layout, .dna-process-layout, .dna-learning-body, .mb-library-layout { grid-template-columns: 1fr; }
+  .dna-inspector { min-height: 0; }
+  .dna-process-canvas-wrap { height: 340px; min-height: 300px; }
+  .mb-structure-canvas { height: 290px; }
+}
+@media (max-width: 480px) {
+  .mb-feature-grid, .mb-path-row { grid-template-columns: 1fr; }
+  .mb-feature-card { min-height: 155px; }
+  .mb-nav button { flex: 1 1 calc(50% - 5px); padding: 8px 7px; font-size: 10px; }
+  .mb-panel-heading { align-items: flex-start; flex-direction: column; }
+  .mb-hero-art { min-height: 120px; }
+  .dna-structure-tools a { margin-left: 0; }
+  .dna-structure-column .molecule-stage { height: 330px; min-height: 330px; }
+  .dna-structure-column .molecule-canvas { min-height: 330px; }
+  .dna-live-tag { align-self: flex-start; }
+  .dna-structure-column .dna-viewer-controls > button { flex: 1 1 auto; }
+  .dna-structure-column .dna-pan-controls { order: 1; }
+  .mb-quiz-results { grid-template-columns: 1fr; }
+}

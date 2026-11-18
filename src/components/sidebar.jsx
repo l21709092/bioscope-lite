@@ -1,4 +1,4 @@
-
+﻿
 import {
   Search,
   Compass,
@@ -6,8 +6,8 @@ import {
   Microscope,
   Brain,
   Leaf,
+  ShieldCheck,
   Bone,
-  HeartPulse,
   History,
   Bookmark,
   Atom
@@ -19,7 +19,7 @@ const categories = [
   { id: "Neuroscience", icon: Brain },
   { id: "Botany", icon: Leaf },
   { id: "Human Anatomy", icon: Bone },
-  { id: "Human Physiology", icon: HeartPulse }
+  { id: "Immunology", icon: ShieldCheck }
 ];
 
 export default function Sidebar({

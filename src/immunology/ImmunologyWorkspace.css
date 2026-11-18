@@ -233,6 +233,110 @@
 .imm-check-button:disabled { opacity: .4; cursor: not-allowed; }
 .imm-correct { color: #6ee7b7 !important; }
 .imm-wrong { color: #fda4af !important; }
+.imm-quiz-card { max-width: 100%; }
+.imm-quiz-progress {
+  display: grid;
+  grid-template-columns: repeat(15, minmax(0, 1fr));
+  gap: 5px;
+  margin: 16px 0 8px;
+}
+.imm-quiz-progress span {
+  height: 5px;
+  border-radius: 8px;
+  background: #334155;
+}
+.imm-quiz-progress span.current { background: #5eead4; }
+.imm-quiz-progress span.correct { background: #34d399; }
+.imm-quiz-progress span.wrong { background: #fb7185; }
+.imm-quiz-count { color: #8fa1b6; font-size: 11px; margin-bottom: 12px; }
+.imm-question-meta { display: flex; flex-wrap: wrap; gap: 7px; margin-bottom: 11px; }
+.imm-question-meta span {
+  border: 1px solid #2a3b53;
+  border-radius: 20px;
+  padding: 5px 9px;
+  color: #9fb2c8;
+  background: #142236;
+  font-size: 10px;
+}
+.imm-question-meta span:first-child { color: #67e8d7; border-color: #287f79; }
+.imm-quiz-options { display: grid; margin: 17px 0; }
+.imm-quiz-options button {
+  display: flex;
+  align-items: flex-start;
+  gap: 11px;
+  text-align: left;
+  line-height: 1.5;
+  width: 100%;
+  color: #dce7f6;
+  border-color: #34445d;
+  background: #142236;
+}
+.imm-option-letter {
+  display: grid;
+  place-items: center;
+  flex: 0 0 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #26374d;
+  color: #a9bdd2;
+  font-size: 10px;
+  font-weight: 700;
+}
+.imm-quiz-options button.chosen { border-color: #54d6c8; background: #173b3c; }
+.imm-quiz-options button.answer-correct { border-color: #34d399; background: #12342f; }
+.imm-quiz-options button.answer-wrong { border-color: #fb7185; background: #3c202d; }
+.imm-explanation {
+  border-left: 3px solid #34d399;
+  border-radius: 6px;
+  background: #142b2b;
+  padding: 11px 13px;
+  margin: 14px 0;
+}
+.imm-explanation.is-wrong { border-color: #fbbf24; background: #302b20; }
+.imm-explanation strong { color: #6ee7b7; font-size: 12px; }
+.imm-explanation.is-wrong strong { color: #fcd34d; }
+.imm-explanation p { color: #c0ccda; font-size: 12px; line-height: 1.65; margin: 5px 0 0; }
+.imm-quiz-actions { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 18px; }
+.imm-quiz-actions button { display: inline-flex; align-items: center; gap: 7px; }
+.imm-quiz-secondary {
+  border: 1px solid #2a3b53;
+  border-radius: 8px;
+  padding: 10px 13px;
+  color: #b9c7d9;
+  background: #142236;
+  cursor: pointer;
+}
+.imm-quiz-secondary:disabled { opacity: .4; cursor: not-allowed; }
+.imm-quiz-results { text-align: center; max-width: 680px; margin: 0 auto; }
+.imm-score-badge {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 3px;
+  margin: 18px 0 0;
+  color: #5eead4;
+  font-size: 42px;
+  font-weight: 700;
+}
+.imm-score-badge span { color: #8fa1b6; font-size: 20px; }
+.imm-quiz-results h2 { margin: 5px 0; }
+.imm-quiz-summary { color: #aab8cb; font-size: 12px; }
+.imm-quiz-results h3 { text-align: left; color: #dbeafe; font-size: 13px; margin: 22px 0 10px; }
+.imm-topic-results { display: grid; gap: 9px; margin-bottom: 20px; text-align: left; }
+.imm-topic-result {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 7px 12px;
+  color: #b9c7d9;
+  background: #142236;
+  border: 1px solid #293a50;
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-size: 11px;
+}
+.imm-topic-result strong { color: #e5edf8; }
+.imm-topic-track { grid-column: 1 / -1; height: 5px; overflow: hidden; border-radius: 8px; background: #334155; }
+.imm-topic-track span { display: block; height: 100%; border-radius: inherit; background: #54d6c8; }
 .imm-note {
   border-left: 3px solid #64748b;
   padding-left: 12px;
@@ -247,4 +351,7 @@
   .imm-tabs button { flex: 1; padding: 9px 7px; font-size: 10px; }
   .imm-controls { flex-wrap: wrap; }
   .imm-canvas-wrap { height: 320px; }
+  .imm-quiz-progress { gap: 3px; }
+  .imm-quiz-actions { align-items: stretch; }
+  .imm-quiz-actions button { justify-content: center; }
 }

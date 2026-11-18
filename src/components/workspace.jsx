@@ -1,5 +1,4 @@
-
-import { lazy, Suspense, useState } from "react";
+﻿import { lazy, Suspense, useState } from "react";
 import PromptBar from "./promptbar";
 import Viewer from "./viewer";
 import Inspector from "./inspector";
@@ -31,24 +30,15 @@ export default function Workspace({ activeSection = "Explore", searchQuery = "" 
 
   const generateScene = () => {
     if (!prompt.trim()) return;
-
-    alert(
-      "Custom scene generation is our next development milestone!"
-    );
+    alert("Custom scene generation is our next development milestone!");
   };
 
   return (
     <main className="workspace">
       <section className="welcome">
-        <p className="eyebrow">
-          EXPLORE THE SCIENCE OF LIFE
-        </p>
-
+        <p className="eyebrow">EXPLORE THE SCIENCE OF LIFE</p>
         <h1>Biology, brought to life.</h1>
-
-        <p>
-          Explore real biological structures in interactive 3D.
-        </p>
+        <p>Explore real biological structures in interactive 3D.</p>
       </section>
 
       <PromptBar
@@ -59,7 +49,6 @@ export default function Workspace({ activeSection = "Explore", searchQuery = "" 
 
       <div className="exploration-grid">
         <Viewer onSelect={setSelectedAtom} />
-
         <Inspector selectedAtom={selectedAtom} />
       </div>
     </main>
