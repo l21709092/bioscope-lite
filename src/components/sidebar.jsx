@@ -3,9 +3,11 @@ import {
   Search,
   Compass,
   Dna,
+  Microscope,
   Brain,
   Leaf,
   ShieldCheck,
+  Bone,
   History,
   Bookmark,
   Atom
@@ -13,8 +15,10 @@ import {
 
 const categories = [
   { id: "Molecular Biology", icon: Dna },
+  { id: "Cell Biology", icon: Microscope },
   { id: "Neuroscience", icon: Brain },
   { id: "Botany", icon: Leaf },
+  { id: "Human Anatomy", icon: Bone },
   { id: "Immunology", icon: ShieldCheck }
 ];
 
