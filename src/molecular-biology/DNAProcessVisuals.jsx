@@ -163,7 +163,7 @@ export default function DNAProcessVisuals({ onComplete }) {
   const [elapsed, setElapsed] = useState(0);
   const elapsedRef = useRef(0);
   const [playing, setPlaying] = useState(true);
-  const [speed, setSpeed] = useState(1);
+  const [speed, setSpeed] = useState(3);
   const config = processInfo[processId];
   const stage = Math.min(config.steps.length - 1, Math.floor(elapsed));
   const progress = Math.min(1, Math.max(0, elapsed - stage));
@@ -215,7 +215,7 @@ export default function DNAProcessVisuals({ onComplete }) {
       <button className="mb-primary-button" onClick={() => setPlaying(value => !value)}>{playing ? <Pause size={16} /> : <Play size={16} />}{playing ? "Pause" : "Play"}</button>
       <button onClick={() => changeStage(1)} disabled={stage === config.steps.length - 1}><ChevronRight size={16} />Next stage</button>
       <button onClick={restart}><RotateCcw size={15} />Restart</button>
-      <label>Speed <select value={speed} onChange={event => setSpeed(Number(event.target.value))}><option value={0.5}>0.5×</option><option value={1}>1×</option><option value={1.5}>1.5×</option></select></label>
+      <label>Speed <select value={speed} onChange={event => setSpeed(Number(event.target.value))}><option value={0.5}>0.5×</option><option value={1}>1×</option><option value={1.5}>1.5×</option><option value={2}>2×</option><option value={3}>3×</option></select></label>
     </div>
     <p className="dna-process-footnote">The molecular actors are simplified educational diagrams. Their geometry and timing do not represent molecular dynamics.</p>
   </section>;

@@ -198,10 +198,10 @@ export default function WBCWorkspace({ active = true }) {
   const [demoType, setDemoType] = useState("neutrophil");
   const [demoElapsed, setDemoElapsed] = useState(0);
   const [demoPlaying, setDemoPlaying] = useState(false);
-  const [demoSpeed, setDemoSpeed] = useState(1);
+  const [demoSpeed, setDemoSpeed] = useState(3);
   const [journeyElapsed, setJourneyElapsed] = useState(0);
   const [journeyPlaying, setJourneyPlaying] = useState(false);
-  const [journeySpeed, setJourneySpeed] = useState(1);
+  const [journeySpeed, setJourneySpeed] = useState(3);
   const [compareMode, setCompareMode] = useState(false);
   const [compareTypes, setCompareTypes] = useState(["neutrophil", "lymphocyte"]);
   const [activityMode, setActivityMode] = useState("name-function");
@@ -641,7 +641,7 @@ export default function WBCWorkspace({ active = true }) {
           <button className="wbc-play-button" onClick={() => journeyPlaying ? setJourneyPlaying(false) : playJourney()}>{journeyPlaying ? <Pause size={16} /> : <Play size={16} />}{journeyPlaying ? "Pause" : "Play"}</button>
           <button onClick={() => moveJourneyStage(1)} disabled={journeyStage === journeyStages.length - 1}><ChevronRight size={16} /> Next stage</button>
           <button onClick={() => { setJourneyPlaying(false); setJourneyTime(0); }}><RotateCcw size={15} /> Restart</button>
-          <label>Speed<select value={journeySpeed} onChange={event => setJourneySpeed(Number(event.target.value))}><option value={0.5}>0.5×</option><option value={1}>1×</option><option value={1.5}>1.5×</option></select></label>
+          <label>Speed<select value={journeySpeed} onChange={event => setJourneySpeed(Number(event.target.value))}><option value={0.5}>0.5×</option><option value={1}>1×</option><option value={1.5}>1.5×</option><option value={2}>2×</option><option value={3}>3×</option></select></label>
           <span className="wbc-run-time">{Math.floor(journeyElapsed / 60)}:{String(Math.floor(journeyElapsed % 60)).padStart(2, "0")} / 0:50</span>
         </div>
         <p className="wbc-journey-footnote">A teaching simulation of leukocyte extravasation and phagocytosis. Molecular timings and shapes are simplified.</p>
@@ -673,7 +673,7 @@ export default function WBCWorkspace({ active = true }) {
           <button className="wbc-play-button" onClick={() => { if (demoFinished) setDemoTime(0); setDemoPlaying(!demoPlaying); }}>{demoPlaying ? <Pause size={16} /> : <Play size={16} />}{demoPlaying ? "Pause" : "Play"}</button>
           <button onClick={() => moveDemoStage(1)} disabled={demoStage === demoStages[demoType].length - 1}><ChevronRight size={16} /> Next</button>
           <button onClick={() => { setDemoPlaying(false); setDemoTime(0); }}><RotateCcw size={15} /> Restart</button>
-          <label>Speed<select value={demoSpeed} onChange={event => setDemoSpeed(Number(event.target.value))}><option value={0.5}>0.5×</option><option value={1}>1×</option><option value={1.5}>1.5×</option></select></label>
+          <label>Speed<select value={demoSpeed} onChange={event => setDemoSpeed(Number(event.target.value))}><option value={0.5}>0.5×</option><option value={1}>1×</option><option value={1.5}>1.5×</option><option value={2}>2×</option><option value={3}>3×</option></select></label>
         </div>
       </section>}
 

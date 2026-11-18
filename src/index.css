@@ -2,9 +2,22 @@
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap');
 
 :root {
+  --app-bg: #080d18;
+  --surface-1: #0c1423;
+  --surface-2: #101a2b;
+  --surface-raised: #111d2e;
+  --line-subtle: #1c2940;
+  --line-strong: #26354d;
+  --text-primary: #eef4ff;
+  --text-secondary: #94a3b8;
+  --accent-primary: #5eead4;
+  --status-success: #34d399;
+  --radius-panel: 13px;
+  --radius-control: 8px;
+  --space-section: 24px;
   font-family: 'DM Sans', sans-serif;
-  color: #eef4ff;
-  background: #080d18;
+  color: var(--text-primary);
+  background: var(--app-bg);
   font-synthesis: none;
 }
 
@@ -18,12 +31,20 @@ body {
   min-height: 100vh;
 }
 
-button, input {
+button, input, select, textarea {
   font: inherit;
 }
 
 button {
   cursor: pointer;
+}
+
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid var(--accent-primary);
+  outline-offset: 2px;
 }
 
 .app {
@@ -36,15 +57,15 @@ button {
   align-items: center;
   justify-content: space-between;
   padding: 0 30px;
-  border-bottom: 1px solid #1c2940;
-  background: #0c1423;
+  border-bottom: 1px solid var(--line-subtle);
+  background: var(--surface-1);
 }
 
 .brand {
   display: flex;
   align-items: center;
   gap: 10px;
-  color: #5eead4;
+  color: var(--accent-primary);
   font-family: 'Space Grotesk', sans-serif;
   font-weight: 700;
   letter-spacing: 2px;
@@ -55,22 +76,6 @@ button {
   color: #94a3b8;
 }
 
-.header-actions {
-  display: flex;
-  gap: 10px;
-}
-
-.icon-button {
-  display: grid;
-  place-items: center;
-  background: transparent;
-  color: #94a3b8;
-  border: 1px solid #26354d;
-  border-radius: 9px;
-  width: 38px;
-  height: 38px;
-}
-
 .app-layout {
   display: grid;
   grid-template-columns: 230px minmax(0, 1fr);
@@ -79,8 +84,8 @@ button {
 .sidebar {
   min-height: calc(100vh - 70px);
   padding: 25px 15px;
-  border-right: 1px solid #1c2940;
-  background: #0c1423;
+  border-right: 1px solid var(--line-subtle);
+  background: var(--surface-1);
   position: relative;
 }
 
@@ -135,6 +140,7 @@ button {
   padding: 38px;
   margin: auto;
   min-width: 0;
+  --section-gap: var(--space-section);
 }
 
 .eyebrow {
@@ -152,40 +158,6 @@ button {
   color: #94a3b8;
 }
 
-.prompt-bar {
-  display: flex;
-  align-items: center;
-  gap: 13px;
-  padding: 10px 12px;
-  margin: 30px 0;
-  border: 1px solid #2a4054;
-  background: #111d2e;
-  border-radius: 12px;
-  color: #5eead4;
-}
-
-.prompt-bar input {
-  flex: 1;
-  min-width: 0;
-  background: transparent;
-  border: 0;
-  outline: 0;
-  color: white;
-  padding: 10px 0;
-}
-
-.prompt-bar button {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  background: #5eead4;
-  color: #07131b;
-  border: 0;
-  border-radius: 8px;
-  padding: 11px 15px;
-  font-weight: 700;
-}
-
 .exploration-grid {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 260px;
@@ -193,9 +165,9 @@ button {
 }
 
 .viewer-panel, .inspector {
-  border: 1px solid #26354d;
-  border-radius: 13px;
-  background: #101a2b;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-panel);
+  background: var(--surface-2);
   min-width: 0;
 }
 
@@ -345,18 +317,6 @@ button {
     padding: 20px 14px;
   }
 
-  .prompt-bar {
-    flex-wrap: wrap;
-  }
-
-  .prompt-bar input {
-    flex-basis: 70%;
-  }
-
-  .prompt-bar button {
-    width: 100%;
-    justify-content: center;
-  }
 }
 
 /* MOLECULAR EXPLORER */
@@ -780,6 +740,20 @@ button {
   border: 1px solid #2b6b72;
   border-radius: 999px;
   background: rgba(7, 17, 31, .82);
+}
+
+.anatomy-loading-overlay {
+  position: absolute;
+  z-index: 2;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.anatomy-hover-overlay {
+  position: absolute;
+  z-index: 5;
+  pointer-events: none;
 }
 
 .anatomy-attribution {
@@ -2310,6 +2284,282 @@ button {
   color: #94a3b8;
   font-size: 10.5px;
   line-height: 1.35;
+}
+
+.phase-card-simple {
+  margin: 7px 0 0;
+  color: #d7e4f2;
+  font-size: 11px;
+  line-height: 1.45;
+}
+
+.heart-speed-control,
+.heart-studio-speed {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: #cbd5e1;
+  font-size: 11px;
+}
+
+.heart-speed-control select,
+.heart-studio-speed select {
+  padding: 6px 8px;
+  color: #e2e8f0;
+  background: #111e30;
+  border: 1px solid #283e5c;
+  border-radius: 6px;
+}
+
+.cardiac-phase-steps {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-top: 8px;
+}
+
+.cardiac-phase-steps button,
+.cardiac-cycle-actions button {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 8px;
+  color: #b8c6d8;
+  background: #111e30;
+  border: 1px solid #253750;
+  border-radius: 6px;
+  font-size: 10px;
+  cursor: pointer;
+}
+
+.cardiac-phase-steps button.active {
+  color: #5eead4;
+  border-color: #5eead4;
+  background: #142b38;
+}
+
+.cardiac-cycle-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 6px;
+  color: #94a3b8;
+  font-size: 10px;
+}
+
+.cardiac-progress-track {
+  height: 4px;
+  margin-top: 8px;
+  overflow: hidden;
+  background: #1a2a3d;
+  border-radius: 99px;
+}
+
+.cardiac-progress-track span {
+  display: block;
+  height: 100%;
+  background: linear-gradient(90deg, #38bdf8, #fb7185);
+  transition: width 60ms linear;
+}
+
+.lung-explorer {
+  width: 100%;
+  min-width: 0;
+  padding: 12px;
+}
+
+.lung-mode-tabs,
+.lung-control-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 7px;
+}
+
+.lung-mode-tabs {
+  margin: 0 0 10px;
+}
+
+.lung-mode-tabs button,
+.lung-control-row button {
+  min-height: 34px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 7px 10px;
+  color: #b9c7d8;
+  background: #111e30;
+  border: 1px solid #263b55;
+  border-radius: var(--radius-control);
+  font-size: 11px;
+  cursor: pointer;
+}
+
+.lung-mode-tabs button.active {
+  color: #5eead4;
+  background: #142b38;
+  border-color: #5eead4;
+}
+
+.lung-canvas-stage {
+  position: relative;
+  height: clamp(320px, 44vw, 470px);
+  min-height: 300px;
+  overflow: hidden;
+  border: 1px solid #1c2940;
+  border-radius: 10px;
+  background: #08101d;
+}
+
+.lung-canvas-stage canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.lung-stage-hint {
+  position: absolute;
+  right: 10px;
+  bottom: 9px;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 8px;
+  color: #c1cfdd;
+  background: rgba(8, 13, 24, 0.78);
+  border: 1px solid rgba(148, 163, 184, 0.22);
+  border-radius: 999px;
+  font-size: 10px;
+  pointer-events: none;
+}
+
+.lung-hover-label,
+.lung-gas-label,
+.heart-cutaway-label {
+  display: inline-block;
+  padding: 5px 8px;
+  color: #eaf3fb;
+  background: rgba(8, 13, 24, 0.9);
+  border: 1px solid rgba(148, 163, 184, 0.3);
+  border-radius: 6px;
+  font: 500 11px 'DM Sans', sans-serif;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.lung-gas-label.oxygen { color: #fca5a5; }
+.lung-gas-label.carbon { color: #7dd3fc; }
+
+.lung-simulation-controls {
+  display: grid;
+  gap: 9px;
+  padding: 12px 2px 2px;
+}
+
+.lung-cycle-copy { min-width: 0; }
+
+.lung-phase-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #5eead4;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.lung-cycle-copy p {
+  margin: 5px 0 0;
+  color: #aebed0;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.lung-progress {
+  height: 5px;
+  overflow: hidden;
+  background: #1a2a3d;
+  border-radius: 99px;
+}
+
+.lung-progress span {
+  display: block;
+  height: 100%;
+  background: linear-gradient(90deg, #38bdf8, #fb7185);
+  transition: width 100ms linear;
+}
+
+.lung-control-row label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #b9c7d8;
+  font-size: 11px;
+}
+
+.lung-control-row select {
+  min-height: 34px;
+  padding: 6px 8px;
+  color: #e2e8f0;
+  background: #111e30;
+  border: 1px solid #263b55;
+  border-radius: 6px;
+}
+
+.lung-control-row button[aria-pressed="true"] {
+  color: #5eead4;
+  border-color: #5eead4;
+}
+
+.search-workspace .eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.search-results-list {
+  display: grid;
+  gap: 10px;
+  margin-top: var(--space-section);
+}
+
+.search-results-list button {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 15px 17px;
+  color: #e2e8f0;
+  text-align: left;
+  background: var(--surface-2);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-control);
+  cursor: pointer;
+}
+
+.search-results-list button:hover {
+  border-color: var(--accent-primary);
+}
+
+.search-results-list button span {
+  display: grid;
+  gap: 5px;
+}
+
+.search-results-list button small {
+  color: var(--text-secondary);
+  font-size: 12px;
+}
+
+@media (max-width: 650px) {
+  .lung-explorer { padding: 8px; }
+  .lung-mode-tabs { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .lung-mode-tabs button { width: 100%; }
+  .lung-canvas-stage { height: 340px; min-height: 280px; }
+  .lung-stage-hint { right: 6px; bottom: 6px; font-size: 9px; }
+  .lung-control-row button { flex: 1 1 calc(50% - 8px); }
 }
 
 

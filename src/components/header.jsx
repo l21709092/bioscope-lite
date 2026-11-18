@@ -1,5 +1,5 @@
 
-import { Microscope, Settings, CircleHelp } from "lucide-react";
+import { Microscope } from "lucide-react";
 
 export default function Header() {
   return (
@@ -10,15 +10,6 @@ export default function Header() {
         <small>LITE</small>
       </div>
 
-      <div className="header-actions">
-        <button className="icon-button" aria-label="Help">
-          <CircleHelp size={19} />
-        </button>
-
-        <button className="icon-button" aria-label="Settings">
-          <Settings size={19} />
-        </button>
-      </div>
     </header>
   );
 }

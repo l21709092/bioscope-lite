@@ -1,6 +1,6 @@
-import { Suspense, useEffect, useMemo, useRef, useState } from "react";
+import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
-import { Html, OrbitControls, useGLTF } from "@react-three/drei";
+import { OrbitControls, useGLTF } from "@react-three/drei";
 import * as THREE from "three";
 import { ANATOMY_BY_KEY } from "./anatomydata";
 import { useAnatomy } from "./anatomystate";
@@ -24,7 +24,7 @@ function modelOpacity(structure, system, query, selected, hovered) {
   return 0.94;
 }
 
-function AnatomyModel({ hoverPointInfo, setHoverPointInfo }) {
+function AnatomyModel({ setHoverPointInfo, onReady }) {
   const { sex, system, query, selectedId, hoverId, spread, onSelect, onHover } = useAnatomy();
   const { scene: source } = useGLTF(MODEL_URLS[sex], false, true);
   const model = useMemo(() => source.clone(true), [source]);
@@ -49,6 +49,8 @@ function AnatomyModel({ hoverPointInfo, setHoverPointInfo }) {
     meshes.current = records;
     return () => records.forEach(({ materials }) => materials.forEach((material) => material.dispose()));
   }, [model]);
+
+  useEffect(() => { onReady?.(); }, [model, onReady]);
 
   useEffect(() => {
     meshes.current.forEach(({ object, origin, direction, materials }) => {
@@ -93,6 +95,12 @@ function AnatomyModel({ hoverPointInfo, setHoverPointInfo }) {
               system: structure.system,
               color: structure.color,
               point: [event.point.x, event.point.y, event.point.z],
+              screenPosition: (() => {
+                const bounds = event.nativeEvent.currentTarget?.getBoundingClientRect?.();
+                return bounds
+                  ? { x: event.nativeEvent.clientX - bounds.left, y: event.nativeEvent.clientY - bounds.top }
+                  : null;
+              })(),
             });
           } else {
             setHoverPointInfo(null);
@@ -105,25 +113,6 @@ function AnatomyModel({ hoverPointInfo, setHoverPointInfo }) {
         }}
       />
 
-      {/* Floating 3D Tooltip Label on Cursor Hover */}
-      {hoverPointInfo && hoverPointInfo.point && (
-        <Html
-          position={hoverPointInfo.point}
-          center
-          style={{ pointerEvents: "none", zIndex: 9999 }}
-        >
-          <div className="anatomy-3d-hover-tag animate-tag-in">
-            <span
-              className="hover-tag-dot"
-              style={{ background: hoverPointInfo.color || "#5eead4" }}
-            />
-            <div className="hover-tag-content">
-              <span className="hover-tag-title">{hoverPointInfo.label}</span>
-              <span className="hover-tag-sys">{hoverPointInfo.system}</span>
-            </div>
-          </div>
-        </Html>
-      )}
     </group>
   );
 }
@@ -153,7 +142,7 @@ function CameraRig() {
   );
 }
 
-function Scene({ hoverPointInfo, setHoverPointInfo }) {
+function Scene({ setHoverPointInfo, onReady }) {
   return (
     <>
       <color attach="background" args={["#07111f"]} />
@@ -167,15 +156,11 @@ function Scene({ hoverPointInfo, setHoverPointInfo }) {
         <meshStandardMaterial color="#0c2033" roughness={0.85} metalness={0.15} />
       </mesh>
       <Suspense
-        fallback={
-          <Html center>
-            <div className="model-loading">Loading 3D Anatomy Model…</div>
-          </Html>
-        }
+        fallback={null}
       >
         <AnatomyModel
-          hoverPointInfo={hoverPointInfo}
           setHoverPointInfo={setHoverPointInfo}
+          onReady={onReady}
         />
       </Suspense>
       <CameraRig />
@@ -184,8 +169,9 @@ function Scene({ hoverPointInfo, setHoverPointInfo }) {
 }
 
 export default function AnatomyViewer() {
-  const { viewKey } = useAnatomy();
   const [hoverPointInfo, setHoverPointInfo] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const handleReady = useCallback(() => setLoading(false), []);
 
   return (
     <div className="anatomy-stage">
@@ -194,10 +180,25 @@ export default function AnatomyViewer() {
         gl={{ antialias: true, alpha: false, powerPreference: "high-performance" }}
       >
         <Scene
-          hoverPointInfo={hoverPointInfo}
           setHoverPointInfo={setHoverPointInfo}
+          onReady={handleReady}
         />
       </Canvas>
+      {hoverPointInfo?.screenPosition && (
+        <div
+          className="anatomy-hover-overlay"
+          style={{ left: hoverPointInfo.screenPosition.x, top: hoverPointInfo.screenPosition.y }}
+        >
+          <div className="anatomy-3d-hover-tag animate-tag-in">
+            <span className="hover-tag-dot" style={{ background: hoverPointInfo.color || "#5eead4" }} />
+            <div className="hover-tag-content">
+              <span className="hover-tag-title">{hoverPointInfo.label}</span>
+              <span className="hover-tag-sys">{hoverPointInfo.system}</span>
+            </div>
+          </div>
+        </div>
+      )}
+      {loading && <div className="model-loading anatomy-loading-overlay" role="status">Loading 3D Anatomy Model…</div>}
     </div>
   );
 }

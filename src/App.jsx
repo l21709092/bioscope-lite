@@ -28,6 +28,7 @@ export default function App() {
         <Workspace
           activeSection={activeSection}
           searchQuery={searchQuery}
+          onSelectSection={setActiveSection}
         />
 
       </div>

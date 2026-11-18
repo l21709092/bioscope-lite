@@ -3,20 +3,14 @@ import {
   Search,
   Compass,
   Dna,
-  Microscope,
-  Brain,
   Leaf,
   ShieldCheck,
   Bone,
-  History,
-  Bookmark,
   Atom
 } from "lucide-react";
 
 const categories = [
   { id: "Molecular Biology", icon: Dna },
-  { id: "Cell Biology", icon: Microscope },
-  { id: "Neuroscience", icon: Brain },
   { id: "Botany", icon: Leaf },
   { id: "Human Anatomy", icon: Bone },
   { id: "Immunology", icon: ShieldCheck }
@@ -75,24 +69,6 @@ export default function Sidebar({
           </button>
         );
       })}
-
-      <p className="sidebar-heading">YOUR LIBRARY</p>
-
-      <button
-        className={`nav-item ${activeSection === "History" ? "active" : ""}`}
-        onClick={() => onSelectSection("History")}
-      >
-        <History size={18} />
-        Recently explored
-      </button>
-
-      <button
-        className={`nav-item ${activeSection === "Bookmarks" ? "active" : ""}`}
-        onClick={() => onSelectSection("Bookmarks")}
-      >
-        <Bookmark size={18} />
-        Bookmarks
-      </button>
 
       <div className="sidebar-footer">
         <span className="status-dot" />

@@ -1,4 +1,4 @@
-import { Suspense, useEffect, useMemo, useRef, useState, useCallback } from "react";
+import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { Html, OrbitControls } from "@react-three/drei";
 import * as THREE from "three";
@@ -14,14 +14,14 @@ import {
   Layers,
   Sparkles,
   MapPin,
-  Compass,
   Heart,
 } from "lucide-react";
 import RealisticHeart from "../anatomy/RealisticHeart";
+import LungAnatomyModel from "../anatomy/LungModel";
 import {
   BPM_MAX,
   BPM_MIN,
-  CHAMBERS,
+  CARDIAC_PHASES,
   VESSELS,
   createFlowParticles,
   flowSpeed,
@@ -101,6 +101,24 @@ class StethoscopeAudio {
 // Global audio singleton for stability
 const stethoscope = new StethoscopeAudio();
 
+const HEART_FOCUS_POINTS = {
+  right_atrium: [-0.2, 0.12, 0.08],
+  right_ventricle: [-0.16, -0.16, 0.08],
+  left_atrium: [0.16, 0.14, 0.06],
+  left_ventricle: [0.16, -0.16, 0.06],
+  tricuspid_valve: [-0.14, -0.01, 0.18],
+  pulmonary_valve: [-0.05, 0.08, 0.15],
+  mitral_valve: [0.1, -0.01, 0.16],
+  aortic_valve: [0.03, 0.1, 0.12],
+  aorta: [0.02, 0.52, 0],
+  svc: [-0.04, 0.7, 0.14],
+  ivc: [0, -0.65, 0.16],
+  "pulmonary-right": [-0.5, 0.32, 0.1],
+  "pulmonary-left": [0.5, 0.35, 0.1],
+  "vein-right": [-0.4, 0.13, 0.1],
+  "vein-left": [0.4, 0.15, 0.1],
+};
+
 // Vessel metadata for hover inspection
 const VESSEL_METADATA = {
   svc: {
@@ -155,7 +173,7 @@ const VESSEL_METADATA = {
   },
 };
 
-function VesselTubes({ onHoverPart, hoverPart, visible = true }) {
+function VesselTubes({ onHoverPart, onSelectPart, hoverPart, visible = true }) {
   if (!visible) return null;
 
   return VESSELS.map((vessel) => {
@@ -169,6 +187,7 @@ function VesselTubes({ onHoverPart, hoverPart, visible = true }) {
     return (
       <mesh
         key={vessel.id}
+        onClick={(event) => { event.stopPropagation(); onSelectPart?.(vessel.id); }}
         onPointerOver={(e) => {
           e.stopPropagation();
           document.body.style.cursor = "pointer";
@@ -201,10 +220,12 @@ function VesselTubes({ onHoverPart, hoverPart, visible = true }) {
   });
 }
 
-function BloodParticles({ visible = true, isPlaying = true }) {
+function BloodParticles({ visible = true, isPlaying = true, cycle, speed = 1 }) {
   const mesh = useRef(null);
   const { bpm } = useAnatomy();
   const bpmRef = useRef(bpm);
+  const cycleRef = useRef(cycle);
+  const speedRef = useRef(speed);
   const dummy = useMemo(() => new THREE.Object3D(), []);
   const particles = useMemo(() => createFlowParticles(290), []);
   const geometry = useMemo(() => new THREE.SphereGeometry(0.032, 8, 8), []);
@@ -223,6 +244,14 @@ function BloodParticles({ visible = true, isPlaying = true }) {
     bpmRef.current = bpm;
   }, [bpm]);
 
+  useEffect(() => {
+    cycleRef.current = cycle;
+  }, [cycle]);
+
+  useEffect(() => {
+    speedRef.current = speed;
+  }, [speed]);
+
   useEffect(() => () => {
     geometry.dispose();
     material.dispose();
@@ -230,11 +259,29 @@ function BloodParticles({ visible = true, isPlaying = true }) {
 
   useFrame((_, delta) => {
     if (!mesh.current || !visible || !isPlaying) return;
-    const speed = flowSpeed(bpmRef.current);
+    const particleSpeed = flowSpeed(bpmRef.current) * speedRef.current;
     const step = Math.min(delta, 0.05);
 
     particles.forEach((particle, index) => {
-      particle.distance = (particle.distance + step * speed) % particle.length;
+      const travel = step * particleSpeed;
+      let boundary = 0;
+      let segmentIndex = 0;
+      for (; segmentIndex < particle.segments.length; segmentIndex += 1) {
+        boundary += particle.segments[segmentIndex].length;
+        if (particle.distance <= boundary) break;
+      }
+      const nextSegment = particle.segments[(segmentIndex + 1) % particle.segments.length];
+      const nextVesselId = VESSELS[nextSegment.path].id;
+      const phaseId = cycleRef.current?.phaseId;
+      const inletOpen = phaseId === "atrial-systole" || phaseId === "ventricular-filling";
+      const outletOpen = phaseId === "ventricular-ejection";
+      const gateClosed = (["right-heart", "left-heart"].includes(nextVesselId) && !inletOpen)
+        || (["pulmonary-right", "pulmonary-left", "aorta"].includes(nextVesselId) && !outletOpen);
+      if (gateClosed && particle.distance + travel >= boundary) {
+        particle.distance = (boundary - 0.002 + particle.length) % particle.length;
+      } else {
+        particle.distance = (particle.distance + travel) % particle.length;
+      }
       const { vessel, t } = sampleFlowParticle(particle);
       const point = vessel.curve.getPointAt(t);
       dummy.position.copy(point);
@@ -259,96 +306,14 @@ function BloodParticles({ visible = true, isPlaying = true }) {
   );
 }
 
-function AnatomicalLungs({ onHoverPart, cycle, visible = true }) {
-  if (!visible) return null;
-
-  // Gentle pulmonary expansion in sync with cycle
-  const lungPulse = 1 + Math.sin(cycle.phase * Math.PI * 2) * 0.022;
-  const lungEmissive = 0.14 + (cycle.phase > 0.35 && cycle.phase < 0.72 ? 0.38 : 0.08);
-
-  return (
-    <group>
-      {/* Right Lung (3 lobes: superior, middle, inferior) */}
-      <group
-        position={CHAMBERS.lungRight}
-        scale={[0.66 * lungPulse, 0.86 * lungPulse, 0.45 * lungPulse]}
-        onPointerOver={(e) => {
-          e.stopPropagation();
-          document.body.style.cursor = "pointer";
-          onHoverPart({
-            name: "right_lung",
-            label: "Right Lung (3 Lobes)",
-            role: "Site of alveolar oxygen uptake; receives deoxygenated blood from right pulmonary artery",
-            system: "Respiratory / Pulmonary Circuit",
-            color: "#fb7185",
-            point: [e.point.x, e.point.y, e.point.z],
-          });
-        }}
-        onPointerOut={() => {
-          document.body.style.cursor = "";
-          onHoverPart(null);
-        }}
-      >
-        <mesh>
-          <sphereGeometry args={[0.55, 26, 20]} />
-          <meshStandardMaterial
-            color="#fda4af"
-            emissive="#fb7185"
-            emissiveIntensity={lungEmissive}
-            transparent
-            opacity={0.3}
-            roughness={0.4}
-            depthWrite={false}
-          />
-        </mesh>
-      </group>
-
-      {/* Left Lung (2 lobes with cardiac notch accommodating heart apex) */}
-      <group
-        position={CHAMBERS.lungLeft}
-        scale={[0.58 * lungPulse, 0.80 * lungPulse, 0.42 * lungPulse]}
-        onPointerOver={(e) => {
-          e.stopPropagation();
-          document.body.style.cursor = "pointer";
-          onHoverPart({
-            name: "left_lung",
-            label: "Left Lung (2 Lobes & Cardiac Notch)",
-            role: "Contains cardiac impression; exchanges CO2 for O2 before sending blood to left pulmonary veins",
-            system: "Respiratory / Pulmonary Circuit",
-            color: "#fb7185",
-            point: [e.point.x, e.point.y, e.point.z],
-          });
-        }}
-        onPointerOut={() => {
-          document.body.style.cursor = "";
-          onHoverPart(null);
-        }}
-      >
-        <mesh>
-          <sphereGeometry args={[0.55, 26, 20]} />
-          <meshStandardMaterial
-            color="#fda4af"
-            emissive="#fb7185"
-            emissiveIntensity={lungEmissive}
-            transparent
-            opacity={0.3}
-            roughness={0.4}
-            depthWrite={false}
-          />
-        </mesh>
-      </group>
-    </group>
-  );
-}
-
-function CirculationCamera({ cameraPreset, setCameraPreset }) {
+function CirculationCamera({ cameraPreset, setCameraPreset, resetKey, focusPart }) {
   const controls = useRef(null);
   const { camera } = useThree();
 
   useEffect(() => {
     if (!controls.current) return;
-    controls.current.target.set(0, 0.05, 0);
-
+    const target = HEART_FOCUS_POINTS[focusPart] || [0, 0.05, 0];
+    controls.current.target.set(...target);
     let pos = [0.15, 0.35, 4.4];
     if (cameraPreset === "anterior") {
       pos = [0.15, 0.25, 4.1];
@@ -357,7 +322,7 @@ function CirculationCamera({ cameraPreset, setCameraPreset }) {
     } else if (cameraPreset === "superior") {
       pos = [0.05, 3.9, 1.8];
     } else if (cameraPreset === "closeUp") {
-      pos = [0.08, -0.06, 2.5];
+      pos = [target[0] + 0.08, target[1] + 0.1, focusPart ? 2.25 : 2.5];
     }
 
     gsap.to(camera.position, {
@@ -368,7 +333,7 @@ function CirculationCamera({ cameraPreset, setCameraPreset }) {
       ease: "power2.out",
       onUpdate: () => controls.current && controls.current.update(),
     });
-  }, [cameraPreset, camera]);
+  }, [cameraPreset, camera, resetKey, focusPart]);
 
   return (
     <OrbitControls
@@ -502,58 +467,34 @@ function rateLabel(bpm) {
   return "Tachycardia / Exercise";
 }
 
-function getDetailedPhase(phase) {
-  if (phase < 0.14) {
-    return {
-      title: "Atrial Systole (P-Wave)",
-      desc: "SA node fires; atria contract to pump the final 20% blood volume into ventricles.",
-      status: "Atrial Inflow",
-    };
-  }
-  if (phase < 0.22) {
-    return {
-      title: "Isovolumetric Contraction (S1 'Lub')",
-      desc: "Ventricles contract; AV valves snap shut (S1 heart sound); ventricular pressure surges.",
-      status: "AV Valves Closed",
-    };
-  }
-  if (phase < 0.42) {
-    return {
-      title: "Rapid Ventricular Ejection (QRS Spike)",
-      desc: "Aortic & pulmonic valves open; blood rushes into aorta and pulmonary arteries.",
-      status: "Systolic Ejection",
-    };
-  }
-  if (phase < 0.50) {
-    return {
-      title: "Isovolumetric Relaxation (S2 'Dub')",
-      desc: "Ventricles relax; semilunar valves snap shut (S2 heart sound); prevents arterial backflow.",
-      status: "Semilunar Closure",
-    };
-  }
-  return {
-    title: "Ventricular Diastole (Filling Phase)",
-    desc: "Chambers expand; passive venous inflow refills right and left atria and ventricles.",
-    status: "Passive Diastole",
+function getDetailedPhase(phaseId) {
+  const active = CARDIAC_PHASES.find((item) => item.id === phaseId) || CARDIAC_PHASES[0];
+  const descriptions = {
+    "atrial-systole": "Atrial contraction tops off the ventricles. The tricuspid and mitral valves are open; the pulmonary and aortic valves are closed.",
+    "isovolumetric-contraction": "The ventricles contract after the atrioventricular valves close. All four valves are briefly shut while ventricular pressure rises.",
+    "ventricular-ejection": "Ventricular pressure opens the pulmonary and aortic valves. The right ventricle sends blood to the lungs and the left ventricle sends blood to the body.",
+    "isovolumetric-relaxation": "The ventricles relax and the semilunar valves close. All four valves are briefly shut while ventricular pressure falls.",
+    "ventricular-filling": "During diastole, blood returns to the atria and flows through the open tricuspid and mitral valves into the relaxed ventricles.",
   };
+  return { title: active.label, desc: descriptions[active.id], status: active.id };
 }
 
 export default function BloodFlow() {
   const { bpm, setBpm, onPhase, onSelect } = useAnatomy();
   const [isPlaying, setIsPlaying] = useState(true);
-  const [heartView, setHeartView] = useState("translucent"); // "realistic", "translucent", "wireframe"
+  const [heartView, setHeartView] = useState("cutaway");
   const [showVessels, setShowVessels] = useState(true);
   const [showParticles, setShowParticles] = useState(true);
-  const [showLandmarks, setShowLandmarks] = useState(false);
+  const [showLabels, setShowLabels] = useState(true);
+  const [speed, setSpeed] = useState(3);
   const [audioEnabled, setAudioEnabled] = useState(false);
   const [cameraPreset, setCameraPreset] = useState("anterior");
+  const [cameraResetKey, setCameraResetKey] = useState(0);
+  const [focusPart, setFocusPart] = useState(null);
+  const [seekRequest, setSeekRequest] = useState({ phase: 0, key: 0 });
+  const [selectedHeartPart, setSelectedHeartPart] = useState(null);
   const [hoveredPart, setHoveredPart] = useState(null);
-  const [currentCycle, setCurrentCycle] = useState({
-    phase: 0,
-    atrial: 0,
-    ventricular: 0,
-    label: "Diastole · chambers filling",
-  });
+  const [currentCycle, setCurrentCycle] = useState(() => sampleCycle(0, 72));
 
   const bpmRef = useRef(bpm);
   const s1FiredRef = useRef(false);
@@ -568,9 +509,25 @@ export default function BloodFlow() {
     setAudioEnabled(newState);
   };
 
+  const selectHeartPart = (id) => {
+    setSelectedHeartPart(id);
+    setFocusPart(id);
+    setCameraPreset("closeUp");
+    onSelect?.(id);
+  };
+  const seekToPhase = (index) => {
+    const phase = CARDIAC_PHASES[index];
+    setSeekRequest((request) => ({ phase: phase.start + 0.005, key: request.key + 1 }));
+    setIsPlaying(false);
+  };
+  const restartCycle = () => {
+    setSeekRequest((request) => ({ phase: 0, key: request.key + 1 }));
+    setIsPlaying(true);
+  };
+
   const detailedPhase = useMemo(
-    () => getDetailedPhase(currentCycle.phase),
-    [currentCycle.phase]
+    () => getDetailedPhase(currentCycle.phaseId),
+    [currentCycle.phaseId]
   );
 
   // Cardiac output estimate: CO = SV * HR (assume standard stroke volume 70 mL)
@@ -599,6 +556,8 @@ export default function BloodFlow() {
         <CardiacCycleClock
           bpmRef={bpmRef}
           isPlaying={isPlaying}
+          speed={speed}
+          seekRequest={seekRequest}
           onCycleUpdate={setCurrentCycle}
           onPhase={onPhase}
           s1FiredRef={s1FiredRef}
@@ -615,42 +574,39 @@ export default function BloodFlow() {
           {/* Exact Realistic 3D Heart from 3D Organ Studio */}
           <RealisticHeart
             shadingMode={
-              heartView === "wireframe"
-                ? "wireframe"
-                : heartView === "xray"
-                ? "xray"
-                : "realistic"
+              "realistic"
             }
-            translucent={heartView === "translucent"}
+            translucent={heartView === "xray"}
+            cutaway={heartView === "cutaway" || heartView === "xray"}
+            cycle={currentCycle}
+            labels={showLabels}
             isPumping={isPlaying}
             bpm={bpm}
-            showPins={showLandmarks}
+            showPins={false}
             scale={0.58}
             offset={[0, 0, 0]}
             onHoverPart={setHoveredPart}
             hoverPart={null} // We render unified 3D hover tag below
-            onSelectPart={(id) => onSelect && onSelect(id)}
+            selectedPart={selectedHeartPart}
+            onSelectPart={selectHeartPart}
           />
 
           {/* Vascular Tube Pipelines */}
           <VesselTubes
             onHoverPart={setHoveredPart}
+            onSelectPart={selectHeartPart}
             hoverPart={hoveredPart}
             visible={showVessels}
           />
 
           {/* Moving Blood Cell Particles */}
-          <BloodParticles visible={showParticles} isPlaying={isPlaying} />
+          <BloodParticles visible={showParticles} isPlaying={isPlaying} cycle={currentCycle} speed={speed} />
 
           {/* Anatomical Bilateral Lungs */}
-          <AnatomicalLungs
-            onHoverPart={setHoveredPart}
-            cycle={currentCycle}
-            visible={showVessels}
-          />
+          {showVessels && <LungAnatomyModel mode="overview" onHoverPart={setHoveredPart} onSelectPart={selectHeartPart} selectedPart={selectedHeartPart} />}
 
           {/* Unified 3D Hover Tag on Cursor Hit Point */}
-          {hoveredPart && hoveredPart.point && (
+          {showLabels && hoveredPart && hoveredPart.point && (
             <Html
               position={hoveredPart.point}
               center
@@ -677,6 +633,8 @@ export default function BloodFlow() {
         <CirculationCamera
           cameraPreset={cameraPreset}
           setCameraPreset={setCameraPreset}
+          resetKey={cameraResetKey}
+          focusPart={focusPart}
         />
       </Canvas>
 
@@ -686,30 +644,30 @@ export default function BloodFlow() {
         <div className="circulation-hud-group" title="Heart Shading Mode">
           <button
             className={`circulation-hud-btn ${
-              heartView === "translucent" ? "active" : ""
+              heartView === "cutaway" ? "active" : ""
             }`}
-            onClick={() => setHeartView("translucent")}
+            onClick={() => setHeartView("cutaway")}
           >
             <Sparkles size={14} />
-            <span>Translucent Hemodynamics</span>
+            <span>Cutaway</span>
           </button>
           <button
             className={`circulation-hud-btn ${
-              heartView === "realistic" ? "active" : ""
+              heartView === "xray" ? "active" : ""
             }`}
-            onClick={() => setHeartView("realistic")}
+            onClick={() => setHeartView("xray")}
+          >
+            <Eye size={14} />
+            <span>X-ray</span>
+          </button>
+          <button
+            className={`circulation-hud-btn ${
+              heartView === "external" ? "active" : ""
+            }`}
+            onClick={() => setHeartView("external")}
           >
             <Heart size={14} />
-            <span>Photorealistic Heart</span>
-          </button>
-          <button
-            className={`circulation-hud-btn ${
-              heartView === "wireframe" ? "active" : ""
-            }`}
-            onClick={() => setHeartView("wireframe")}
-          >
-            <Layers size={14} />
-            <span>Wireframe</span>
+            <span>External</span>
           </button>
         </div>
 
@@ -719,7 +677,7 @@ export default function BloodFlow() {
             className={`circulation-hud-btn ${
               cameraPreset === "anterior" ? "active" : ""
             }`}
-            onClick={() => setCameraPreset("anterior")}
+            onClick={() => { setFocusPart(null); setCameraPreset("anterior"); }}
             title="Frontal View"
           >
             <span>Anterior</span>
@@ -728,7 +686,7 @@ export default function BloodFlow() {
             className={`circulation-hud-btn ${
               cameraPreset === "posterior" ? "active" : ""
             }`}
-            onClick={() => setCameraPreset("posterior")}
+            onClick={() => { setFocusPart(null); setCameraPreset("posterior"); }}
             title="Dorsal View"
           >
             <span>Posterior</span>
@@ -737,7 +695,7 @@ export default function BloodFlow() {
             className={`circulation-hud-btn ${
               cameraPreset === "superior" ? "active" : ""
             }`}
-            onClick={() => setCameraPreset("superior")}
+            onClick={() => { setFocusPart(null); setCameraPreset("superior"); }}
             title="Aortic Arch & Pulmonary Trunk"
           >
             <span>Arch</span>
@@ -769,10 +727,12 @@ export default function BloodFlow() {
           {/* Toggles */}
           <button
             className={`circulation-hud-btn icon-only ${
-              showLandmarks ? "active" : ""
+              showLabels ? "active" : ""
             }`}
-            onClick={() => setShowLandmarks((prev) => !prev)}
-            title="Toggle Anatomical Landmarks"
+            onClick={() => setShowLabels((prev) => !prev)}
+            title={showLabels ? "Hide anatomical labels" : "Show anatomical labels"}
+            aria-label={showLabels ? "Hide anatomical labels" : "Show anatomical labels"}
+            aria-pressed={showLabels}
           >
             <MapPin size={14} />
           </button>
@@ -782,8 +742,26 @@ export default function BloodFlow() {
             }`}
             onClick={() => setShowParticles((prev) => !prev)}
             title="Toggle Blood Cell Flow"
+            aria-label={showParticles ? "Hide blood flow particles" : "Show blood flow particles"}
+            aria-pressed={showParticles}
           >
             <Activity size={14} />
+          </button>
+          <button
+            className="circulation-hud-btn icon-only"
+            onClick={() => setShowVessels((previous) => !previous)}
+            title={showVessels ? "Hide lungs and vessels" : "Show lungs and vessels"}
+            aria-label={showVessels ? "Hide lungs and vessels" : "Show lungs and vessels"}
+            aria-pressed={showVessels}
+          >
+            <Layers size={14} />
+          </button>
+          <button
+            className="circulation-hud-btn"
+            onClick={() => { setFocusPart(null); setCameraPreset("anterior"); setCameraResetKey((key) => key + 1); }}
+            title="Restore the anterior camera view"
+          >
+            <RotateCcw size={14} /><span>Reset camera</span>
           </button>
         </div>
       </div>
@@ -798,6 +776,7 @@ export default function BloodFlow() {
                 className="play-pause-btn"
                 onClick={() => setIsPlaying((prev) => !prev)}
                 title={isPlaying ? "Pause Cardiac Cycle" : "Play Cardiac Cycle"}
+                aria-label={isPlaying ? "Pause cardiac cycle" : "Play cardiac cycle"}
               >
                 {isPlaying ? <Pause size={13} /> : <Play size={13} />}
               </button>
@@ -826,6 +805,27 @@ export default function BloodFlow() {
           aria-label="Heart rate in beats per minute"
           onChange={(event) => setBpm(Number(event.target.value))}
         />
+
+        <label className="heart-speed-control">Cycle speed
+          <select value={speed} onChange={(event) => setSpeed(Number(event.target.value))}>
+            <option value={0.5}>0.5×</option><option value={1}>1×</option><option value={1.5}>1.5×</option><option value={2}>2×</option><option value={3}>3×</option>
+          </select>
+        </label>
+
+        <div className="cardiac-phase-steps" aria-label="Choose a cardiac cycle phase">
+          {CARDIAC_PHASES.map((phase, index) => (
+            <button key={phase.id} type="button" className={currentCycle.phaseId === phase.id ? "active" : ""} aria-pressed={currentCycle.phaseId === phase.id} onClick={() => seekToPhase(index)}>
+              {index + 1}. {phase.label}
+            </button>
+          ))}
+        </div>
+        <div className="cardiac-progress-track" role="progressbar" aria-label="Progress through current heartbeat" aria-valuenow={Math.round(currentCycle.phase * 100)} aria-valuemin={0} aria-valuemax={100}>
+          <span style={{ width: `${currentCycle.phase * 100}%` }} />
+        </div>
+        <div className="cardiac-cycle-actions">
+          <button type="button" onClick={restartCycle}><RotateCcw size={14} />Restart cycle</button>
+          <span>LV pressure (illustrative): {currentCycle.ventricularPressure ?? 8} mmHg</span>
+        </div>
 
         {/* Quick Rate Preset Chips */}
         <div className="bpm-preset-chips">
@@ -862,6 +862,7 @@ export default function BloodFlow() {
             <span className="phase-title">{detailedPhase.title}</span>
           </div>
           <p className="phase-card-desc">{detailedPhase.desc}</p>
+          <p className="phase-card-simple">{currentCycle.simple}</p>
         </div>
       </div>
 
@@ -885,39 +886,50 @@ export default function BloodFlow() {
 function CardiacCycleClock({
   bpmRef,
   isPlaying,
+  speed,
+  seekRequest,
   onCycleUpdate,
   onPhase,
   s1FiredRef,
   s2FiredRef,
 }) {
-  const clockRef = useRef({ lastElapsed: 0, time: 0 });
+  const clockRef = useRef({ time: 0, lastUiUpdate: 0, seekKey: 0 });
 
   useFrame((state, delta) => {
+    if (clockRef.current.seekKey !== seekRequest.key) {
+      clockRef.current.seekKey = seekRequest.key;
+      clockRef.current.time = (seekRequest.phase * 60) / Math.max(bpmRef.current, 30);
+    }
     if (isPlaying) {
-      clockRef.current.time += delta;
+      clockRef.current.time += delta * speed;
     }
     const cycle = sampleCycle(clockRef.current.time, bpmRef.current);
-    onCycleUpdate(cycle);
-    onPhase(cycle.label);
-
-    // Audio S1 / S2 triggers
-    const cycleDuration = 60 / Math.max(bpmRef.current, 30);
-    const cycleTime = (clockRef.current.time % cycleDuration) / cycleDuration;
-
-    if (cycleTime < 0.1) {
+    const previousPhase = clockRef.current.lastCyclePhase ?? cycle.phase;
+    const crossed = (boundary) => previousPhase <= cycle.phase
+      ? previousPhase < boundary && cycle.phase >= boundary
+      : previousPhase < boundary || cycle.phase >= boundary;
+    if (cycle.phase < previousPhase) {
       s1FiredRef.current = false;
       s2FiredRef.current = false;
     }
-
-    if (cycleTime >= 0.12 && cycleTime < 0.22 && !s1FiredRef.current) {
+    if (isPlaying && crossed(0.12) && !s1FiredRef.current) {
       s1FiredRef.current = true;
       stethoscope.playS1();
     }
-
-    if (cycleTime >= 0.42 && cycleTime < 0.52 && !s2FiredRef.current) {
+    if (isPlaying && crossed(0.42) && !s2FiredRef.current) {
       s2FiredRef.current = true;
       stethoscope.playS2();
     }
+    clockRef.current.lastCyclePhase = cycle.phase;
+    const changedPhase = cycle.phaseId !== clockRef.current.lastPhase;
+    if (changedPhase || state.clock.elapsedTime - clockRef.current.lastUiUpdate > 0.06) {
+      clockRef.current.lastPhase = cycle.phaseId;
+      clockRef.current.lastUiUpdate = state.clock.elapsedTime;
+      onCycleUpdate(cycle);
+      onPhase(cycle.label);
+    }
+
+    // Audio S1 / S2 triggers
   });
 
   return null;

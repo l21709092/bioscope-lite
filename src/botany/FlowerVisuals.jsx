@@ -10,7 +10,7 @@ export default function FlowerVisuals() {
   const [phaseProgress, setPhaseProgress] = useState(0);
   const phaseProgressRef = useRef(0);
   const [playing, setPlaying] = useState(true);
-  const [speed, setSpeed] = useState(1);
+  const [speed, setSpeed] = useState(3);
   const phase = pollinationPhases[phaseIndex];
 
   useEffect(() => {
@@ -72,7 +72,7 @@ export default function FlowerVisuals() {
           <button type="button" className="botany-play-button" onClick={() => setPlaying(value => !value)}>{playing ? <Pause size={16} /> : <Play size={16} />}{playing ? "Pause" : "Play"}</button>
           <button type="button" onClick={() => stepPhase(1)}>Next phase<ChevronRight size={16} /></button>
           <button type="button" onClick={restart}><RotateCcw size={15} />Restart</button>
-          <label>Speed<select value={speed} onChange={event => setSpeed(Number(event.target.value))}><option value={0.5}>0.5×</option><option value={1}>1×</option><option value={1.5}>1.5×</option></select></label>
+          <label>Speed<select value={speed} onChange={event => setSpeed(Number(event.target.value))}><option value={0.5}>0.5×</option><option value={1}>1×</option><option value={1.5}>1.5×</option><option value={2}>2×</option><option value={3}>3×</option></select></label>
         </div>
       </div>
       <aside className="botany-phase-explanation" aria-live="polite">

@@ -1,7 +1,8 @@
-import { useMemo, useRef, useEffect, useState } from "react";
+import { useMemo, useRef, useEffect } from "react";
 import { useFrame } from "@react-three/fiber";
 import { useGLTF, Html } from "@react-three/drei";
 import * as THREE from "three";
+import { sampleCycle } from "../data/heartdata";
 
 const HEART_MODEL_URL = "/anatomy/heart.glb";
 
@@ -9,7 +10,7 @@ const HEART_MODEL_URL = "/anatomy/heart.glb";
 useGLTF.preload(HEART_MODEL_URL);
 
 // Anatomical landmarks specifically measured for the realistic heart model
-export const REALISTIC_HEART_LANDMARKS = [
+const REALISTIC_HEART_LANDMARKS = [
   {
     name: "Ascending Aorta & Arch",
     position: [0.08, 0.72, -0.05],
@@ -77,7 +78,7 @@ export const REALISTIC_HEART_LANDMARKS = [
 ];
 
 // Helper to determine anatomical region based on 3D hit point on the normalized heart
-export function getHeartSubstructureFromPoint(x, y, z) {
+function getHeartSubstructureFromPoint(x, y, z) {
   // Coordinates are relative to normalized heart centered at [0, 0, 0]
   if (y > 0.55 && x > -0.2 && x < 0.28 && z < 0.15) {
     return REALISTIC_HEART_LANDMARKS[0]; // Ascending Aorta & Arch
@@ -111,11 +112,131 @@ export function getHeartSubstructureFromPoint(x, y, z) {
   };
 }
 
+const INTERNAL_CHAMBERS = [
+  { id: "right_atrium", name: "Right atrium", position: [-0.31, 0.18, 0.17], scale: [0.22, 0.18, 0.14], color: "#3478db", active: "atrial" },
+  { id: "right_ventricle", name: "Right ventricle", position: [-0.2, -0.19, 0.2], scale: [0.23, 0.32, 0.13], color: "#2563a9", active: "ventricular" },
+  { id: "left_atrium", name: "Left atrium", position: [0.22, 0.2, 0.12], scale: [0.2, 0.17, 0.12], color: "#bd4558", active: "atrial" },
+  { id: "left_ventricle", name: "Left ventricle", position: [0.19, -0.18, 0.13], scale: [0.2, 0.35, 0.14], color: "#b93246", active: "ventricular" },
+];
+
+const INTERNAL_VALVES = [
+  { id: "tricuspid_valve", name: "Tricuspid valve", position: [-0.24, -0.02, 0.29], state: "tricuspid" },
+  { id: "pulmonary_valve", name: "Pulmonary valve", position: [-0.08, 0.1, 0.28], state: "pulmonary" },
+  { id: "mitral_valve", name: "Mitral valve", position: [0.15, -0.01, 0.24], state: "mitral" },
+  { id: "aortic_valve", name: "Aortic valve", position: [0.05, 0.15, 0.2], state: "aortic" },
+];
+
+function CutawayChamber({ chamber, cycle, selectedPart, showLabels, onSelectPart }) {
+  const chamberRef = useRef(null);
+  const selected = selectedPart === chamber.id;
+
+  useFrame((_, delta) => {
+    if (!chamberRef.current) return;
+    const contraction = cycle?.[chamber.active] || 0;
+    const targetY = 1 - contraction * (chamber.active === "ventricular" ? 0.12 : 0.07);
+    chamberRef.current.scale.y = THREE.MathUtils.damp(chamberRef.current.scale.y, targetY, 12, delta);
+  });
+
+  return (
+    <group
+      position={chamber.position}
+      scale={chamber.scale}
+      onClick={(event) => { event.stopPropagation(); onSelectPart(chamber.id); }}
+      onPointerOver={(event) => { event.stopPropagation(); document.body.style.cursor = "pointer"; }}
+      onPointerOut={() => { document.body.style.cursor = ""; }}
+    >
+      <group ref={chamberRef}>
+      <mesh>
+        <sphereGeometry args={[1, 24, 18]} />
+        <meshStandardMaterial color={selected ? "#5eead4" : chamber.color} roughness={0.55} transparent opacity={0.82} />
+      </mesh>
+      <mesh scale={[0.69, 0.76, 0.7]} position={[0, -0.015, 0.13]}>
+        <sphereGeometry args={[1, 20, 16]} />
+        <meshStandardMaterial color="#101827" roughness={0.3} />
+      </mesh>
+      {showLabels && (
+        <Html center distanceFactor={7} style={{ pointerEvents: "none" }}>
+          <span className="heart-cutaway-label">{chamber.name}</span>
+        </Html>
+      )}
+      </group>
+    </group>
+  );
+}
+
+function CutawayValve({ valve, cycle, selectedPart, showLabels, onSelectPart }) {
+  const flapsRef = useRef(null);
+  const open = Boolean(cycle?.valves?.[valve.state]);
+  const selected = selectedPart === valve.id;
+
+  useFrame((_, delta) => {
+    if (!flapsRef.current) return;
+    const target = open ? 0.4 : -0.12;
+    flapsRef.current.rotation.z = THREE.MathUtils.damp(flapsRef.current.rotation.z, target, 12, delta);
+  });
+
+  return (
+    <group
+      position={valve.position}
+      onClick={(event) => { event.stopPropagation(); onSelectPart(valve.id); }}
+      onPointerOver={(event) => { event.stopPropagation(); document.body.style.cursor = "pointer"; }}
+      onPointerOut={() => { document.body.style.cursor = ""; }}
+    >
+      <mesh rotation={[Math.PI / 2, 0, 0]}>
+        <torusGeometry args={[0.075, 0.009, 8, 24]} />
+        <meshStandardMaterial color={selected ? "#5eead4" : open ? "#f4ead8" : "#c5a878"} />
+      </mesh>
+      <group ref={flapsRef}>
+        {[0, 1, 2].map((leaflet) => (
+          <mesh key={leaflet} position={[Math.cos((leaflet / 3) * Math.PI * 2) * 0.034, 0, Math.sin((leaflet / 3) * Math.PI * 2) * 0.034]} rotation={[0, (leaflet / 3) * Math.PI * 2, 0]}>
+            <boxGeometry args={[0.055, 0.008, 0.035]} />
+            <meshStandardMaterial color={selected ? "#5eead4" : "#e9ddc9"} />
+          </mesh>
+        ))}
+      </group>
+      {showLabels && (
+        <Html center distanceFactor={7} style={{ pointerEvents: "none" }}>
+          <span className="heart-cutaway-label">{valve.name} · {open ? "open" : "closed"}</span>
+        </Html>
+      )}
+    </group>
+  );
+}
+
+function HeartCutaway({ visible, cycle, selectedPart, showLabels, onSelectPart }) {
+  if (!visible) return null;
+  return (
+    <group>
+      {INTERNAL_CHAMBERS.map((chamber) => (
+        <CutawayChamber
+          key={chamber.id}
+          chamber={chamber}
+          cycle={cycle}
+          selectedPart={selectedPart}
+          showLabels={showLabels}
+          onSelectPart={onSelectPart}
+        />
+      ))}
+      {INTERNAL_VALVES.map((valve) => (
+        <CutawayValve
+          key={valve.id}
+          valve={valve}
+          cycle={cycle}
+          selectedPart={selectedPart}
+          showLabels={showLabels}
+          onSelectPart={onSelectPart}
+        />
+      ))}
+    </group>
+  );
+}
+
 export default function RealisticHeart({
   shadingMode = "realistic", // realistic, xray, wireframe
   showPins = true,
   isPumping = false,
   bpm = 72,
+  animationSpeed = 1,
   onHoverPart = () => {},
   hoverPart = null,
   onSelectPart = () => {},
@@ -123,13 +244,16 @@ export default function RealisticHeart({
   scale = 0.58,
   offset = [0, 0, 0],
   translucent = false,
+  cutaway = false,
+  cycle = null,
+  labels = false,
   emissiveIntensity = 0.15,
   highlightColor = "#5eead4",
 }) {
   const { scene: source } = useGLTF(HEART_MODEL_URL);
   const heartGroupRef = useRef(null);
-  const meshRef = useRef(null);
   const materialsRef = useRef([]);
+  const animationTimeRef = useRef(0);
 
   // Clone scene and set up materials
   const clonedScene = useMemo(() => {
@@ -138,7 +262,6 @@ export default function RealisticHeart({
 
     clone.traverse((child) => {
       if (child.isMesh) {
-        meshRef.current = child;
         child.castShadow = true;
         child.receiveShadow = true;
 
@@ -156,9 +279,14 @@ export default function RealisticHeart({
       }
     });
 
-    materialsRef.current = mats;
+    clone.userData.heartMaterials = mats;
     return clone;
   }, [source]);
+
+  useEffect(() => {
+    materialsRef.current = clonedScene.userData.heartMaterials || [];
+    return () => materialsRef.current.forEach((material) => material?.dispose?.());
+  }, [clonedScene]);
 
   // Adjust material appearance based on shading mode & translucent flag
   useEffect(() => {
@@ -171,10 +299,10 @@ export default function RealisticHeart({
         mat.opacity = 1;
         mat.roughness = 0.5;
         mat.metalness = 0.1;
-      } else if (shadingMode === "xray" || translucent) {
+      } else if (shadingMode === "xray" || translucent || cutaway) {
         mat.wireframe = false;
         mat.transparent = true;
-        mat.opacity = translucent ? 0.38 : 0.45;
+        mat.opacity = translucent ? 0.38 : cutaway ? 0.1 : 0.45;
         mat.depthWrite = false;
         mat.roughness = 0.2;
         mat.metalness = 0.3;
@@ -193,41 +321,20 @@ export default function RealisticHeart({
       }
       mat.needsUpdate = true;
     });
-  }, [shadingMode, translucent, hoverPart, highlightColor, emissiveIntensity]);
+  }, [clonedScene, shadingMode, translucent, cutaway, hoverPart, highlightColor, emissiveIntensity]);
 
   // Pumping heartbeat animation
-  useFrame((state) => {
-    if (!isPumping || !heartGroupRef.current) return;
-
-    const cycleDuration = 60 / Math.max(bpm, 30);
-    const cycleTime = (state.clock.elapsedTime % cycleDuration) / cycleDuration;
-
-    // Physiological cardiac cycle wringing motion:
-    // Ventricular systole occurs between t = 0.15 and 0.45
-    let ventricularContraction = 0;
-    if (cycleTime >= 0.12 && cycleTime <= 0.42) {
-      const progress = (cycleTime - 0.12) / 0.30;
-      ventricularContraction = Math.sin(progress * Math.PI);
-    }
-
-    // Atrial systole occurs between t = 0.00 and 0.12
-    let atrialContraction = 0;
-    if (cycleTime < 0.12) {
-      const progress = cycleTime / 0.12;
-      atrialContraction = Math.sin(progress * Math.PI) * 0.05;
-    }
-
-    // Ventricular squeeze: inward compression along X and Z, slight shortening on Y
-    const squeezeX = 1 - ventricularContraction * 0.12 + atrialContraction;
-    const squeezeY = 1 - ventricularContraction * 0.04;
-    const squeezeZ = 1 - ventricularContraction * 0.11 + atrialContraction;
-    const torsion = ventricularContraction * 0.035; // Natural apical twist
-
-    heartGroupRef.current.scale.set(
-      scale * squeezeX,
-      scale * squeezeY,
-      scale * squeezeZ
-    );
+  useFrame((_, delta) => {
+    if (!heartGroupRef.current) return;
+    if (!cycle && isPumping) animationTimeRef.current += delta * animationSpeed;
+    const internalCycle = cycle || sampleCycle(animationTimeRef.current, bpm);
+    const ventricularContraction = isPumping ? internalCycle?.ventricular || 0 : 0;
+    const atrialContraction = isPumping ? internalCycle?.atrial || 0 : 0;
+    const squeezeX = 1 - ventricularContraction * 0.06 + atrialContraction * 0.025;
+    const squeezeY = 1 - ventricularContraction * 0.035;
+    const squeezeZ = 1 - ventricularContraction * 0.07 + atrialContraction * 0.025;
+    const torsion = ventricularContraction * 0.025;
+    heartGroupRef.current.scale.set(scale * squeezeX, scale * squeezeY, scale * squeezeZ);
     heartGroupRef.current.rotation.y = torsion;
   });
 
@@ -242,20 +349,22 @@ export default function RealisticHeart({
           object={clonedScene}
           onClick={(e) => {
             e.stopPropagation();
+            const localPoint = heartGroupRef.current.worldToLocal(e.point.clone());
             const substruct = getHeartSubstructureFromPoint(
-              e.point.x,
-              e.point.y,
-              e.point.z
+              localPoint.x,
+              localPoint.y,
+              localPoint.z
             );
             onSelectPart(substruct.region || "heart");
           }}
           onPointerMove={(e) => {
             e.stopPropagation();
             document.body.style.cursor = "pointer";
+            const localPoint = heartGroupRef.current.worldToLocal(e.point.clone());
             const substruct = getHeartSubstructureFromPoint(
-              e.point.x,
-              e.point.y,
-              e.point.z
+              localPoint.x,
+              localPoint.y,
+              localPoint.z
             );
             onHoverPart({
               name: substruct.region || "heart",
@@ -271,7 +380,15 @@ export default function RealisticHeart({
             onHoverPart(null);
           }}
         />
+        <HeartCutaway
+          visible={cutaway}
+          cycle={cycle}
+          selectedPart={selectedPart}
+          showLabels={labels}
+          onSelectPart={onSelectPart}
+        />
       </group>
+
 
       {/* Interactive Landmark Pins */}
       {showPins &&

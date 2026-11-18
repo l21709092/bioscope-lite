@@ -1,12 +1,12 @@
 import { useMemo, useState } from "react";
-import { Bone, HeartPulse, Sparkles, User, Layers } from "lucide-react";
+import { HeartPulse, Sparkles, User } from "lucide-react";
 import AnatomyViewer from "./anatomyviewer";
 import AnatomyControls from "./anatomycontrols";
 import OrganStudioViewer from "./OrganStudioViewer";
 import OrganSelectorStrip from "./OrganSelectorStrip";
 import AnatomyInspector from "./AnatomyInspector";
 import BloodFlow from "../simulations/bloodflow";
-import { ATTRIBUTION, PARTS, structuresFor } from "./anatomydata";
+import { structuresFor } from "./anatomydata";
 import { AnatomyContext } from "./anatomystate";
 import { ORGAN_MAP, findPresetForPart } from "./organStudioData";
 
@@ -86,11 +86,6 @@ export default function AnatomySection({ searchQuery = "" }) {
   );
 
   const structures = useMemo(() => structuresFor(sex), [sex]);
-  const inView =
-    system === "all"
-      ? structures.length
-      : structures.filter((part) => part.system === system).length;
-
   return (
     <AnatomyContext.Provider value={api}>
       <main className="workspace anatomy-workspace">

@@ -6,6 +6,7 @@ import { ANATOMY_BY_KEY } from "./anatomydata";
 import { ORGAN_MAP, ORGAN_PRESETS } from "./organStudioData";
 import { RotateCw, HeartPulse, Compass, RefreshCw } from "lucide-react";
 import RealisticHeart from "./RealisticHeart";
+import LungExplorer from "./LungExplorer";
 
 const MODEL_URLS = {
   male: "/anatomy/anatomy-male.glb",
@@ -25,10 +26,8 @@ function IsolatedOrganModel({
 }) {
   const { scene: source } = useGLTF(MODEL_URLS[sex], false, true);
   const groupRef = useRef(null);
-  const [extractedMeshes, setExtractedMeshes] = useState([]);
-
-  useEffect(() => {
-    if (!source || !organPreset) return;
+  const extractedMeshes = useMemo(() => {
+    if (!source || !organPreset) return [];
 
     const targetNames = organPreset.meshes || [organPreset.primaryKey];
     const matchingObjects = [];
@@ -39,10 +38,7 @@ function IsolatedOrganModel({
       }
     });
 
-    if (matchingObjects.length === 0) {
-      setExtractedMeshes([]);
-      return;
-    }
+    if (matchingObjects.length === 0) return [];
 
     const aggregateBox = new THREE.Box3();
     matchingObjects.forEach((mesh) => {
@@ -80,15 +76,15 @@ function IsolatedOrganModel({
       };
     });
 
-    setExtractedMeshes(prepared);
+    return prepared;
+  }, [source, organPreset]);
 
-    return () => {
-      prepared.forEach(({ object }) => {
-        const mats = Array.isArray(object.material) ? object.material : [object.material];
-        mats.forEach((m) => m?.dispose?.());
-      });
-    };
-  }, [source, organPreset, sex]);
+  useEffect(() => () => {
+    extractedMeshes.forEach(({ object }) => {
+      const mats = Array.isArray(object.material) ? object.material : [object.material];
+      mats.forEach((material) => material?.dispose?.());
+    });
+  }, [extractedMeshes]);
 
   useEffect(() => {
     extractedMeshes.forEach(({ name, object, color }) => {
@@ -200,7 +196,7 @@ function IsolatedOrganModel({
 }
 
 // Camera Rig
-function OrganCameraRig({ presetView, autoRotate, cameraDistance = 2.4 }) {
+function OrganCameraRig({ presetView, autoRotate, cameraDistance = 2.4, resetKey }) {
   const controlsRef = useRef(null);
   const { camera } = useThree();
 
@@ -227,7 +223,7 @@ function OrganCameraRig({ presetView, autoRotate, cameraDistance = 2.4 }) {
         break;
     }
     controlsRef.current.update();
-  }, [presetView, camera, cameraDistance]);
+  }, [presetView, camera, cameraDistance, resetKey]);
 
   useFrame(() => {
     if (autoRotate && controlsRef.current) {
@@ -261,7 +257,9 @@ export default function OrganStudioViewer({
   const [showPins, setShowPins] = useState(true);
   const [autoRotate, setAutoRotate] = useState(false);
   const [isPumping, setIsPumping] = useState(true);
+  const [heartSpeed, setHeartSpeed] = useState(3);
   const [presetView, setPresetView] = useState("isometric");
+  const [cameraResetKey, setCameraResetKey] = useState(0);
   const [hoverPart, setHoverPart] = useState(null);
 
   const organPreset = useMemo(
@@ -270,6 +268,11 @@ export default function OrganStudioViewer({
   );
 
   const isHeart = organPreset.id === "heart";
+  const isLungs = organPreset.id === "lungs";
+
+  if (isLungs) {
+    return <LungExplorer onSelectPart={onSelectPart} selectedPart={selectedPart} />;
+  }
 
   return (
     <div className="organ-studio-container">
@@ -307,7 +310,7 @@ export default function OrganStudioViewer({
           </button>
           <button
             className="hud-btn"
-            onClick={() => setPresetView("isometric" + Math.random())}
+            onClick={() => { setPresetView("isometric"); setCameraResetKey((key) => key + 1); }}
             title="Reset to 3D View"
           >
             <RefreshCw size={13} />
@@ -359,14 +362,26 @@ export default function OrganStudioViewer({
             >
               X-Ray
             </button>
-            <button
-              className={`hud-btn ${shadingMode === "wireframe" ? "active" : ""}`}
-              onClick={() => setShadingMode("wireframe")}
-              title="Wireframe Mesh"
-            >
-              Wire
-            </button>
+            {isHeart ? (
+              <button
+                className={`hud-btn ${shadingMode === "cutaway" ? "active" : ""}`}
+                onClick={() => setShadingMode("cutaway")}
+                title="Reveal the internal chambers and valves"
+              >Cutaway</button>
+            ) : (
+              <button
+                className={`hud-btn ${shadingMode === "wireframe" ? "active" : ""}`}
+                onClick={() => setShadingMode("wireframe")}
+                title="Wireframe Mesh"
+              >Wire</button>
+            )}
           </div>
+
+          {isHeart && <label className="heart-studio-speed">Cycle speed
+            <select value={heartSpeed} onChange={(event) => setHeartSpeed(Number(event.target.value))}>
+              <option value={0.5}>0.5×</option><option value={1}>1×</option><option value={1.5}>1.5×</option><option value={2}>2×</option><option value={3}>3×</option>
+            </select>
+          </label>}
         </div>
       </div>
 
@@ -405,8 +420,12 @@ export default function OrganStudioViewer({
             {isHeart ? (
               <RealisticHeart
                 shadingMode={shadingMode}
+                cutaway={shadingMode === "cutaway"}
+                translucent={shadingMode === "xray"}
+                labels={showPins}
                 showPins={showPins}
                 isPumping={isPumping}
+                animationSpeed={heartSpeed}
                 bpm={72}
                 onHoverPart={setHoverPart}
                 hoverPart={hoverPart}
@@ -432,6 +451,7 @@ export default function OrganStudioViewer({
             presetView={presetView}
             autoRotate={autoRotate}
             cameraDistance={isHeart ? 2.8 : organPreset.cameraDistance}
+            resetKey={cameraResetKey}
           />
         </Canvas>
       </div>

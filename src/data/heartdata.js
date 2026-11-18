@@ -24,6 +24,49 @@ export const CHAMBERS = {
   lungLeft: [1.15, 0.1, 0],
 };
 
+export const CARDIAC_PHASES = [
+  {
+    id: "atrial-systole",
+    label: "Atrial systole",
+    start: 0,
+    end: 0.12,
+    simple: "The atria squeeze the last part of their blood into the relaxed ventricles. The tricuspid and mitral valves are open.",
+    valves: { tricuspid: true, pulmonary: false, mitral: true, aortic: false },
+  },
+  {
+    id: "isovolumetric-contraction",
+    label: "Isovolumetric contraction",
+    start: 0.12,
+    end: 0.2,
+    simple: "The ventricles begin to squeeze. The inlet valves close, and pressure rises while all four valves are shut.",
+    valves: { tricuspid: false, pulmonary: false, mitral: false, aortic: false },
+  },
+  {
+    id: "ventricular-ejection",
+    label: "Ventricular ejection",
+    start: 0.2,
+    end: 0.42,
+    simple: "The ventricles push blood out: the right side sends it to the lungs and the left side sends it to the body.",
+    valves: { tricuspid: false, pulmonary: true, mitral: false, aortic: true },
+  },
+  {
+    id: "isovolumetric-relaxation",
+    label: "Isovolumetric relaxation",
+    start: 0.42,
+    end: 0.5,
+    simple: "The ventricles relax. The outlet valves close, so all four valves are briefly shut as pressure falls.",
+    valves: { tricuspid: false, pulmonary: false, mitral: false, aortic: false },
+  },
+  {
+    id: "ventricular-filling",
+    label: "Ventricular filling (diastole)",
+    start: 0.5,
+    end: 1,
+    simple: "The heart relaxes. Blood returns to both atria and flows passively through the open inlet valves into the ventricles.",
+    valves: { tricuspid: true, pulmonary: false, mitral: true, aortic: false },
+  },
+];
+
 function curve(points) {
   return new THREE.CatmullRomCurve3(
     points.map((point) => new THREE.Vector3(...point)),
@@ -81,7 +124,7 @@ export const VESSELS = [
     ]),
     radius: 0.04,
     glass: "#7c3aed",
-    colorAt: shift(BLUE, RED, 0.38, 0.86),
+    colorAt: hold(BLUE),
   },
   {
     id: "pulmonary-left",
@@ -94,7 +137,7 @@ export const VESSELS = [
     ]),
     radius: 0.04,
     glass: "#7c3aed",
-    colorAt: shift(BLUE, RED, 0.38, 0.86),
+    colorAt: hold(BLUE),
   },
   {
     id: "vein-right",
@@ -153,14 +196,30 @@ export const VESSELS = [
     glass: "#fb7185",
     colorAt: shift(RED, BLUE, 0.5, 0.96),
   },
+  {
+    id: "gas-exchange-right",
+    name: "Right lung capillaries",
+    curve: curve([RIGHT_LUNG, [-1.42, 0.18, 0.12], [-1.5, 0.02, 0.12], [-1.37, -0.14, 0.12], RIGHT_LUNG]),
+    radius: 0.018,
+    glass: "#7c3aed",
+    colorAt: shift(BLUE, RED, 0.08, 0.92),
+  },
+  {
+    id: "gas-exchange-left",
+    name: "Left lung capillaries",
+    curve: curve([LEFT_LUNG, [1.42, 0.2, 0.12], [1.5, 0.04, 0.12], [1.36, -0.13, 0.12], LEFT_LUNG]),
+    radius: 0.018,
+    glass: "#7c3aed",
+    colorAt: shift(BLUE, RED, 0.08, 0.92),
+  },
 ];
 
 // Two complete routes keep every blood cell on one physiologically ordered loop:
 // body → right heart → lungs → left heart → body. The routes use opposite lungs
 // so both pulmonary sides remain active without jumping between disconnected tubes.
 export const FLOW_ROUTES = [
-  [8, 9, 1, 2, 3, 5, 7],
-  [8, 9, 1, 2, 4, 6, 7],
+  [8, 9, 1, 2, 3, 10, 5, 7],
+  [8, 9, 1, 2, 4, 11, 6, 7],
 ];
 
 export function createFlowParticles(total = 260) {
@@ -202,14 +261,21 @@ export function flowSpeed(bpm) {
  */
 export function sampleCycle(elapsed, bpm) {
   const phase = (elapsed * (bpm / 60)) % 1;
-  const atrial = phase < 0.14 ? Math.sin((phase / 0.14) * Math.PI) : 0;
+  const active = CARDIAC_PHASES.find((item) => phase >= item.start && phase < item.end)
+    || CARDIAC_PHASES[CARDIAC_PHASES.length - 1];
+  const atrial = phase < 0.12 ? Math.sin((phase / 0.12) * Math.PI) : 0;
   const ventricular = phase >= 0.12 && phase < 0.42
     ? Math.sin(((phase - 0.12) / 0.3) * Math.PI)
     : 0;
 
-  let label = "Diastole · chambers filling";
-  if (phase < 0.14) label = "Atrial systole";
-  else if (phase < 0.42) label = "Ventricular systole";
-
-  return { phase, atrial, ventricular, label };
+  return {
+    phase,
+    atrial,
+    ventricular,
+    label: active.label,
+    phaseId: active.id,
+    simple: active.simple,
+    valves: active.valves,
+    ventricularPressure: Math.round(8 + ventricular * 112),
+  };
 }

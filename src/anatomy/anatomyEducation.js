@@ -739,7 +739,7 @@ export function resolveEducation(key, system) {
   if (!key) return GLOBAL_ANATOMY_EDUCATION;
   const lower = key.toLowerCase();
   
-  if (/heart|cardiac|aorta|vena/.test(lower)) return ORGAN_EDUCATION.heart;
+  if (/heart|cardiac|aorta|vena|\bsvc\b|\bivc\b|pulmonary|\bvein|valve|atrium|ventricle|septum|apex|lad/.test(lower)) return ORGAN_EDUCATION.heart;
   if (/brain|cereb|pituitary|cranial/.test(lower)) return ORGAN_EDUCATION.brain;
   if (/lung|bronch|trachea|larynx/.test(lower)) return ORGAN_EDUCATION.lungs;
   if (/liver|gallbladder|biliary/.test(lower)) return ORGAN_EDUCATION.liver;
